@@ -1,0 +1,148 @@
+{
+  "info": {
+    "name": "RetailProject API",
+    "_postman_id": "9b5f4971-71a8-4e3e-9e4b-d64f7d64a001",
+    "description": "Collection for testing the separated RetailProject backend APIs.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    }
+  ],
+  "item": [
+    {
+      "name": "Filter Options",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/filter-options",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "filter-options"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Dashboard Summary",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/dashboard",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "dashboard"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Dashboard With Filters",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/dashboard?city=Mumbai&category=Electronics",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "dashboard"
+          ],
+          "query": [
+            {
+              "key": "city",
+              "value": "Mumbai"
+            },
+            {
+              "key": "category",
+              "value": "Electronics"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Table Data",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/table?name=raw-input&page=1&pageSize=10",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "table"
+          ],
+          "query": [
+            {
+              "key": "name",
+              "value": "raw-input"
+            },
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "pageSize",
+              "value": "10"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "AI Question",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/ask?q=Which city contributes the highest sales?",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "ask"
+          ],
+          "query": [
+            {
+              "key": "q",
+              "value": "Which city contributes the highest sales?"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Download CSV",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/download/raw-input",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "download",
+            "raw-input"
+          ]
+        }
+      }
+    }
+  ]
+}

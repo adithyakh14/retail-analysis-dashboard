@@ -18,7 +18,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import org.springframework.stereotype.Service;
 
+@Service
 public class DashboardDataService {
     private static final List<String> SUGGESTED_QUESTIONS = List.of(
             "Which city contributes the highest sales?",

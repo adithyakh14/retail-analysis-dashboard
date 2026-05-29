@@ -1,3 +1,5 @@
+const API_BASE_URL = window.RETAIL_API_BASE_URL || "http://localhost:8080";
+
 const tableDefinitions = [
     { name: "raw-input", label: "Raw Input" },
     { name: "fact-sales", label: "Fact Sales" },
@@ -28,22 +30,23 @@ const state = {
     search: ""
 };
 
-async function fetchJson(url) {
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error(`Request failed: ${response.status}`);
-    }
-    return response.json();
-}
-
-function queryString(params) {
+function apiUrl(path, params = {}) {
     const query = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
         if (value !== "") {
             query.set(key, value);
         }
     });
-    return query.toString();
+    const suffix = query.toString();
+    return `${API_BASE_URL}${path}${suffix ? `?${suffix}` : ""}`;
+}
+
+async function fetchJson(url) {
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`Request failed: ${response.status}`);
+    }
+    return response.json();
 }
 
 function formatCurrency(value) {
@@ -256,8 +259,8 @@ function renderTableElement(tableId, tableData) {
 
 function renderTable(tableData) {
     renderTableElement("dataTable", tableData);
-    document.getElementById("pageLabel").textContent = `Page ${tableData.page} of ${tableData.totalPages} • ${tableData.totalRows} rows`;
-    document.getElementById("downloadTable").href = tableData.downloadUrl;
+    document.getElementById("pageLabel").textContent = `Page ${tableData.page} of ${tableData.totalPages} · ${tableData.totalRows} rows`;
+    document.getElementById("downloadTable").href = `${API_BASE_URL}${tableData.downloadUrl}`;
 }
 
 function renderAiChart(chart) {
@@ -350,7 +353,7 @@ function renderSuggestions(suggestions) {
 }
 
 async function loadFilters() {
-    const filterOptions = await fetchJson("/api/filter-options");
+    const filterOptions = await fetchJson(apiUrl("/api/filter-options"));
     createOptions("dateFrom", filterOptions.dates);
     createOptions("dateTo", filterOptions.dates);
     createOptions("city", filterOptions.cities);
@@ -362,7 +365,7 @@ async function loadFilters() {
 }
 
 async function loadDashboard() {
-    const dashboard = await fetchJson(`/api/dashboard?${queryString(state.filters)}`);
+    const dashboard = await fetchJson(apiUrl("/api/dashboard", state.filters));
     renderSummary(dashboard.summary);
     renderInsightList("topInsights", dashboard.insights.topInsights);
     renderInsightList("watchouts", dashboard.insights.watchouts);
@@ -384,12 +387,12 @@ async function loadDashboard() {
 }
 
 async function loadTable() {
-    const tableData = await fetchJson(`/api/table?${queryString({
+    const tableData = await fetchJson(apiUrl("/api/table", {
         name: state.currentTable,
         page: state.currentPage,
         pageSize: state.pageSize,
         search: state.search
-    })}`);
+    }));
     renderTable(tableData);
 }
 
@@ -398,7 +401,7 @@ async function askQuestion() {
     document.getElementById("aiAnswer").textContent = "Reviewing the current data selection...";
     document.getElementById("aiInterpretation").textContent = "Preparing a business interpretation...";
 
-    const response = await fetchJson(`/api/ask?${queryString({ q: question, ...state.filters })}`);
+    const response = await fetchJson(apiUrl("/api/ask", { q: question, ...state.filters }));
     document.getElementById("aiAnswer").textContent = response.answer || "";
     document.getElementById("aiInterpretation").textContent = response.interpretation || "No additional interpretation returned.";
     renderSuggestions(response.suggestions || []);

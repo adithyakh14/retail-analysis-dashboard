@@ -1,3 +1,6 @@
 /target/
 /bin/
 /output/
+/.m2/
+/.maven/
+*.log
