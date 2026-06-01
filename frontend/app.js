@@ -1,4 +1,14 @@
-const API_BASE_URL = window.RETAIL_API_BASE_URL || "http://localhost:8080";
+const API_BASE_URL = (() => {
+    if (window.RETAIL_API_BASE_URL) {
+        return window.RETAIL_API_BASE_URL;
+    }
+
+    if (window.location.protocol === "file:") {
+        return "http://localhost:8080";
+    }
+
+    return "https://retail-analysis-dashboard.onrender.com";
+})();
 
 const tableDefinitions = [
     { name: "raw-input", label: "Raw Input" },
