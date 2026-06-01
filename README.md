@@ -2,9 +2,16 @@
 
 Retail Analysis Dashboard is an API-first Spring Boot backend with a separate browser frontend. It reads a CSV dataset, builds an in-memory warehouse-style model, generates report exports, exposes typed REST APIs, and supports a standalone dashboard client that consumes those APIs.
 
-## Live Demo
+## Live Deployment
 
-https://retail-analysis-dashboard.onrender.com/
+- Frontend dashboard:
+  `https://retail-analysis-dashboard-frontend.onrender.com`
+- Backend API:
+  `https://retail-analysis-dashboard.onrender.com`
+
+Client-facing link:
+
+`https://retail-analysis-dashboard-frontend.onrender.com`
 
 ## What The Project Does
 
@@ -223,9 +230,18 @@ docker run -p 8080:8080 retail-analysis-dashboard
 
 The container builds the Spring Boot jar in a Maven stage and runs it on Java 21.
 
+### Frontend And Backend On Render
+
+The deployed setup uses two Render services:
+
+- a `Static Site` for the frontend dashboard
+- a `Web Service` for the Spring Boot backend API
+
+The frontend should be treated as the main user-facing deliverable. The backend URL is primarily for API access, Swagger, and technical testing.
+
 ### Avoiding The Whitelabel Error Page
 
-If someone opens the backend root URL directly, the project now shows a friendly landing page instead of Spring Boot's default error page.
+If someone opens the backend root URL directly, the project now redirects to the deployed frontend when `app.frontend-url` is configured. Otherwise it shows a friendly landing page instead of Spring Boot's default error page.
 
 If you want the backend root URL to open the deployed frontend automatically, configure:
 
@@ -237,6 +253,12 @@ On Render, this can be added as an environment variable:
 
 ```text
 APP_FRONTEND_URL=https://your-frontend-url
+```
+
+Current deployed value:
+
+```text
+APP_FRONTEND_URL=https://retail-analysis-dashboard-frontend.onrender.com
 ```
 
 ## Important Implementation Notes
