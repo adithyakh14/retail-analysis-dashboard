@@ -223,6 +223,22 @@ docker run -p 8080:8080 retail-analysis-dashboard
 
 The container builds the Spring Boot jar in a Maven stage and runs it on Java 21.
 
+### Avoiding The Whitelabel Error Page
+
+If someone opens the backend root URL directly, the project now shows a friendly landing page instead of Spring Boot's default error page.
+
+If you want the backend root URL to open the deployed frontend automatically, configure:
+
+```text
+app.frontend-url=https://your-frontend-url
+```
+
+On Render, this can be added as an environment variable:
+
+```text
+APP_FRONTEND_URL=https://your-frontend-url
+```
+
 ## Important Implementation Notes
 
 - The backend is API-only; the frontend is a separate client folder.
