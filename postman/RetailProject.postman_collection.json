@@ -2,7 +2,7 @@
   "info": {
     "name": "RetailProject API",
     "_postman_id": "9b5f4971-71a8-4e3e-9e4b-d64f7d64a001",
-    "description": "Collection for testing the secured RetailProject backend on Render. Update the credential variables after import before sending authenticated requests.",
+    "description": "Collection for testing the secured RetailProject backend on Render with API bearer tokens and browser-style dashboard auth.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -12,28 +12,36 @@
     },
     {
       "key": "userUsername",
-      "value": "replace-with-render-user-username"
+      "value": "user"
     },
     {
       "key": "userPassword",
-      "value": "replace-with-render-user-password"
+      "value": "user-123"
     },
     {
       "key": "adminUsername",
-      "value": "replace-with-render-admin-username"
+      "value": "admin"
     },
     {
       "key": "adminPassword",
-      "value": "replace-with-render-admin-password"
+      "value": "admin-123"
+    },
+    {
+      "key": "userToken",
+      "value": ""
+    },
+    {
+      "key": "adminToken",
+      "value": ""
     }
   ],
   "item": [
     {
       "name": "Anonymous Access",
-      "description": "Requests that should be blocked with 401 when no credentials are sent.",
+      "description": "Requests that should be blocked with 401 when no token is sent.",
       "item": [
         {
-          "name": "Filter Options Without Auth",
+          "name": "Filter Options Without Token",
           "request": {
             "method": "GET",
             "header": [],
@@ -51,7 +59,7 @@
           }
         },
         {
-          "name": "Dashboard Without Auth",
+          "name": "Dashboard Without Token",
           "request": {
             "method": "GET",
             "header": [],
@@ -67,63 +75,122 @@
             },
             "description": "Expected: 401 Unauthorized"
           }
-        },
+        }
+      ]
+    },
+    {
+      "name": "API Login",
+      "description": "Run one of these first to capture a bearer token into the collection variables.",
+      "item": [
         {
-          "name": "Download Without Auth",
+          "name": "User Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.collectionVariables.set('userToken', body.accessToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
-            "method": "GET",
-            "header": [],
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{userUsername}}\",\n  \"password\": \"{{userPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
-              "raw": "{{baseUrl}}/download/raw-input",
+              "raw": "{{baseUrl}}/api/auth/login",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "download",
-                "raw-input"
+                "api",
+                "auth",
+                "login"
               ]
             },
-            "description": "Expected: 401 Unauthorized"
+            "description": "Expected: 200 OK and saves accessToken to userToken"
           }
         },
         {
-          "name": "API Docs Without Auth",
+          "name": "Admin Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const body = pm.response.json();",
+                  "  pm.collectionVariables.set('adminToken', body.accessToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
-            "method": "GET",
-            "header": [],
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{adminUsername}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
-              "raw": "{{baseUrl}}/v3/api-docs",
+              "raw": "{{baseUrl}}/api/auth/login",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "v3",
-                "api-docs"
+                "api",
+                "auth",
+                "login"
               ]
             },
-            "description": "Expected: 401 Unauthorized"
+            "description": "Expected: 200 OK and saves accessToken to adminToken"
           }
         }
       ]
     },
     {
       "name": "User Access",
-      "description": "Requests using the regular USER account. Replace the user variables after import.",
+      "description": "Requests using the USER bearer token saved by User Login.",
       "item": [
         {
           "name": "Filter Options",
           "request": {
             "auth": {
-              "type": "basic",
-              "basic": [
+              "type": "bearer",
+              "bearer": [
                 {
-                  "key": "username",
-                  "value": "{{userUsername}}",
-                  "type": "string"
-                },
-                {
-                  "key": "password",
-                  "value": "{{userPassword}}",
+                  "key": "token",
+                  "value": "{{userToken}}",
                   "type": "string"
                 }
               ]
@@ -147,16 +214,11 @@
           "name": "Dashboard Summary",
           "request": {
             "auth": {
-              "type": "basic",
-              "basic": [
+              "type": "bearer",
+              "bearer": [
                 {
-                  "key": "username",
-                  "value": "{{userUsername}}",
-                  "type": "string"
-                },
-                {
-                  "key": "password",
-                  "value": "{{userPassword}}",
+                  "key": "token",
+                  "value": "{{userToken}}",
                   "type": "string"
                 }
               ]
@@ -180,16 +242,11 @@
           "name": "Dashboard With Filters",
           "request": {
             "auth": {
-              "type": "basic",
-              "basic": [
+              "type": "bearer",
+              "bearer": [
                 {
-                  "key": "username",
-                  "value": "{{userUsername}}",
-                  "type": "string"
-                },
-                {
-                  "key": "password",
-                  "value": "{{userPassword}}",
+                  "key": "token",
+                  "value": "{{userToken}}",
                   "type": "string"
                 }
               ]
@@ -223,16 +280,11 @@
           "name": "Table Data",
           "request": {
             "auth": {
-              "type": "basic",
-              "basic": [
+              "type": "bearer",
+              "bearer": [
                 {
-                  "key": "username",
-                  "value": "{{userUsername}}",
-                  "type": "string"
-                },
-                {
-                  "key": "password",
-                  "value": "{{userPassword}}",
+                  "key": "token",
+                  "value": "{{userToken}}",
                   "type": "string"
                 }
               ]
@@ -270,16 +322,11 @@
           "name": "AI Question",
           "request": {
             "auth": {
-              "type": "basic",
-              "basic": [
+              "type": "bearer",
+              "bearer": [
                 {
-                  "key": "username",
-                  "value": "{{userUsername}}",
-                  "type": "string"
-                },
-                {
-                  "key": "password",
-                  "value": "{{userPassword}}",
+                  "key": "token",
+                  "value": "{{userToken}}",
                   "type": "string"
                 }
               ]
@@ -309,16 +356,11 @@
           "name": "Download CSV Should Be Blocked",
           "request": {
             "auth": {
-              "type": "basic",
-              "basic": [
+              "type": "bearer",
+              "bearer": [
                 {
-                  "key": "username",
-                  "value": "{{userUsername}}",
-                  "type": "string"
-                },
-                {
-                  "key": "password",
-                  "value": "{{userPassword}}",
+                  "key": "token",
+                  "value": "{{userToken}}",
                   "type": "string"
                 }
               ]
@@ -342,16 +384,11 @@
           "name": "API Docs Should Be Blocked",
           "request": {
             "auth": {
-              "type": "basic",
-              "basic": [
+              "type": "bearer",
+              "bearer": [
                 {
-                  "key": "username",
-                  "value": "{{userUsername}}",
-                  "type": "string"
-                },
-                {
-                  "key": "password",
-                  "value": "{{userPassword}}",
+                  "key": "token",
+                  "value": "{{userToken}}",
                   "type": "string"
                 }
               ]
@@ -375,22 +412,17 @@
     },
     {
       "name": "Admin Access",
-      "description": "Requests using the ADMIN account. Replace the admin variables after import.",
+      "description": "Requests using the ADMIN bearer token saved by Admin Login.",
       "item": [
         {
           "name": "Filter Options",
           "request": {
             "auth": {
-              "type": "basic",
-              "basic": [
+              "type": "bearer",
+              "bearer": [
                 {
-                  "key": "username",
-                  "value": "{{adminUsername}}",
-                  "type": "string"
-                },
-                {
-                  "key": "password",
-                  "value": "{{adminPassword}}",
+                  "key": "token",
+                  "value": "{{adminToken}}",
                   "type": "string"
                 }
               ]
@@ -414,16 +446,11 @@
           "name": "Dashboard Summary",
           "request": {
             "auth": {
-              "type": "basic",
-              "basic": [
+              "type": "bearer",
+              "bearer": [
                 {
-                  "key": "username",
-                  "value": "{{adminUsername}}",
-                  "type": "string"
-                },
-                {
-                  "key": "password",
-                  "value": "{{adminPassword}}",
+                  "key": "token",
+                  "value": "{{adminToken}}",
                   "type": "string"
                 }
               ]
@@ -447,16 +474,11 @@
           "name": "Download CSV",
           "request": {
             "auth": {
-              "type": "basic",
-              "basic": [
+              "type": "bearer",
+              "bearer": [
                 {
-                  "key": "username",
-                  "value": "{{adminUsername}}",
-                  "type": "string"
-                },
-                {
-                  "key": "password",
-                  "value": "{{adminPassword}}",
+                  "key": "token",
+                  "value": "{{adminToken}}",
                   "type": "string"
                 }
               ]
@@ -480,16 +502,11 @@
           "name": "API Docs",
           "request": {
             "auth": {
-              "type": "basic",
-              "basic": [
+              "type": "bearer",
+              "bearer": [
                 {
-                  "key": "username",
-                  "value": "{{adminUsername}}",
-                  "type": "string"
-                },
-                {
-                  "key": "password",
-                  "value": "{{adminPassword}}",
+                  "key": "token",
+                  "value": "{{adminToken}}",
                   "type": "string"
                 }
               ]

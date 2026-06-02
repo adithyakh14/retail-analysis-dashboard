@@ -3,26 +3,38 @@ package com.retailproject;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 class DashboardControllerTest {
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private LoginAttemptService loginAttemptService;
+
+    @BeforeEach
+    void resetAttempts() {
+        loginAttemptService.reset("admin");
+        loginAttemptService.reset("analyst");
+    }
 
     @Test
     void protectedApiRejectsAnonymousUsers() throws Exception {
@@ -79,8 +91,32 @@ class DashboardControllerTest {
     }
 
     @Test
-    void filterOptionsSupportsBasicAuthWithConfiguredUser() throws Exception {
-        mockMvc.perform(get("/api/filter-options").with(httpBasic("admin", "change-me-now")))
+    void apiLoginReturnsBearerToken() throws Exception {
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"username":"admin","password":"change-me-now"}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").isString())
+                .andExpect(jsonPath("$.tokenType").value("Bearer"))
+                .andExpect(jsonPath("$.username").value("admin"));
+    }
+
+    @Test
+    void filterOptionsSupportsBearerTokenFromApiLogin() throws Exception {
+        MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"username":"admin","password":"change-me-now"}
+                                """))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String token = com.jayway.jsonpath.JsonPath.read(loginResult.getResponse().getContentAsString(), "$.accessToken");
+
+        mockMvc.perform(get("/api/filter-options")
+                        .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.cities").isArray());
     }

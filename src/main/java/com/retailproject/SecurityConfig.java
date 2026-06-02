@@ -4,16 +4,18 @@ import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
-import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -25,17 +27,19 @@ public class SecurityConfig {
             HttpSecurity http,
             CorsConfigurationSource corsConfigurationSource,
             SecurityAuditFilter securityAuditFilter,
+            ApiTokenAuthenticationFilter apiTokenAuthenticationFilter,
             CustomAuthenticationFailureHandler failureHandler) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .ignoringRequestMatchers(new OrRequestMatcher(
+                                new AntPathRequestMatcher("/api/auth/**"),
                                 new AntPathRequestMatcher("/api/**"),
                                 new AntPathRequestMatcher("/download/**"),
                                 new AntPathRequestMatcher("/v3/api-docs/**"))))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/", "/login", "/error/**").permitAll()
+                        .requestMatchers("/", "/login", "/error/**", "/api/auth/**").permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/download/**").hasRole("ADMIN")
                         .requestMatchers("/dashboard/**", "/api/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated())
@@ -56,11 +60,18 @@ public class SecurityConfig {
                         .permitAll())
                 .logout(logout -> logout
                         .logoutSuccessUrl("/login?logout"))
-                .httpBasic(Customizer.withDefaults())
+                .httpBasic(httpBasic -> httpBasic.disable())
+                .addFilterBefore(apiTokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(securityAuditFilter, org.springframework.security.web.access.intercept.AuthorizationFilter.class);
 
         return http.build();
     }
+
+    @Bean
+    AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
+    }
+
     @Bean
     PasswordEncoder passwordEncoder() {
         PasswordEncoder delegating = PasswordEncoderFactories.createDelegatingPasswordEncoder();
