@@ -29,6 +29,15 @@ public class LoginController {
 
         String messageClass = logout ? "notice-success" : (locked || invalid) ? "notice-error" : "notice-info";
 
+        String csrfField = "";
+        if (csrfToken != null) {
+            csrfField = """
+                    <input type="hidden" name="__CSRF_NAME__" value="__CSRF_TOKEN__">
+                    """
+                    .replace("__CSRF_NAME__", csrfToken.getParameterName())
+                    .replace("__CSRF_TOKEN__", csrfToken.getToken());
+        }
+
         String htmlTemplate = """
                 <!DOCTYPE html>
                 <html lang="en">
@@ -210,7 +219,7 @@ public class LoginController {
                         <p>Use your configured application credentials to enter the dashboard, call the APIs, and open Swagger.</p>
                         <div class="notice __MESSAGE_CLASS__" role="alert" aria-live="polite">__MESSAGE__</div>
                         <form method="post" action="/login">
-                            <input type="hidden" name="__CSRF_NAME__" value="__CSRF_TOKEN__">
+                            __CSRF_FIELD__
                             <label>
                                 <span>Username</span>
                                 <input type="text" name="username" autocomplete="username" required>
@@ -256,8 +265,7 @@ public class LoginController {
         String html = htmlTemplate
                 .replace("__MESSAGE_CLASS__", messageClass)
                 .replace("__MESSAGE__", message)
-                .replace("__CSRF_NAME__", csrfToken.getParameterName())
-                .replace("__CSRF_TOKEN__", csrfToken.getToken());
+                .replace("__CSRF_FIELD__", csrfField);
 
         return ResponseEntity.ok()
                 .contentType(MediaType.TEXT_HTML)
