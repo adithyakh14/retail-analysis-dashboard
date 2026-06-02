@@ -2,147 +2,412 @@
   "info": {
     "name": "RetailProject API",
     "_postman_id": "9b5f4971-71a8-4e3e-9e4b-d64f7d64a001",
-    "description": "Collection for testing the separated RetailProject backend APIs.",
+    "description": "Collection for testing the secured RetailProject backend on Render. Update the credential variables after import before sending authenticated requests.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "baseUrl",
       "value": "https://retail-analysis-dashboard.onrender.com"
+    },
+    {
+      "key": "userUsername",
+      "value": "replace-with-render-user-username"
+    },
+    {
+      "key": "userPassword",
+      "value": "replace-with-render-user-password"
+    },
+    {
+      "key": "adminUsername",
+      "value": "replace-with-render-admin-username"
+    },
+    {
+      "key": "adminPassword",
+      "value": "replace-with-render-admin-password"
     }
   ],
   "item": [
     {
-      "name": "Filter Options",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/api/filter-options",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "api",
-            "filter-options"
-          ]
-        }
-      }
-    },
-    {
-      "name": "Dashboard Summary",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/api/dashboard",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "api",
-            "dashboard"
-          ]
-        }
-      }
-    },
-    {
-      "name": "Dashboard With Filters",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/api/dashboard?city=Mumbai&category=Electronics",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "api",
-            "dashboard"
-          ],
-          "query": [
-            {
-              "key": "city",
-              "value": "Mumbai"
+      "name": "Anonymous Access",
+      "description": "Requests that should be blocked with 401 when no credentials are sent.",
+      "item": [
+        {
+          "name": "Filter Options Without Auth",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/filter-options",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "filter-options"
+              ]
             },
-            {
-              "key": "category",
-              "value": "Electronics"
-            }
-          ]
-        }
-      }
-    },
-    {
-      "name": "Table Data",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/api/table?name=raw-input&page=1&pageSize=10",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "api",
-            "table"
-          ],
-          "query": [
-            {
-              "key": "name",
-              "value": "raw-input"
+            "description": "Expected: 401 Unauthorized"
+          }
+        },
+        {
+          "name": "Dashboard Without Auth",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "dashboard"
+              ]
             },
-            {
-              "key": "page",
-              "value": "1"
+            "description": "Expected: 401 Unauthorized"
+          }
+        },
+        {
+          "name": "Download Without Auth",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/download/raw-input",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "download",
+                "raw-input"
+              ]
             },
-            {
-              "key": "pageSize",
-              "value": "10"
-            }
-          ]
+            "description": "Expected: 401 Unauthorized"
+          }
+        },
+        {
+          "name": "API Docs Without Auth",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v3/api-docs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v3",
+                "api-docs"
+              ]
+            },
+            "description": "Expected: 401 Unauthorized"
+          }
         }
-      }
+      ]
     },
     {
-      "name": "AI Question",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/api/ask?q=Which city contributes the highest sales?",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "api",
-            "ask"
-          ],
-          "query": [
-            {
-              "key": "q",
-              "value": "Which city contributes the highest sales?"
-            }
-          ]
+      "name": "User Access",
+      "description": "Requests using the regular USER account. Replace the user variables after import.",
+      "auth": {
+        "type": "basic",
+        "basic": [
+          {
+            "key": "username",
+            "value": "{{userUsername}}",
+            "type": "string"
+          },
+          {
+            "key": "password",
+            "value": "{{userPassword}}",
+            "type": "string"
+          }
+        ]
+      },
+      "item": [
+        {
+          "name": "Filter Options",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/filter-options",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "filter-options"
+              ]
+            },
+            "description": "Expected: 200 OK"
+          }
+        },
+        {
+          "name": "Dashboard Summary",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "dashboard"
+              ]
+            },
+            "description": "Expected: 200 OK"
+          }
+        },
+        {
+          "name": "Dashboard With Filters",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard?city=Mumbai&category=Electronics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "dashboard"
+              ],
+              "query": [
+                {
+                  "key": "city",
+                  "value": "Mumbai"
+                },
+                {
+                  "key": "category",
+                  "value": "Electronics"
+                }
+              ]
+            },
+            "description": "Expected: 200 OK"
+          }
+        },
+        {
+          "name": "Table Data",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/table?name=raw-input&page=1&pageSize=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "table"
+              ],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "raw-input"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Expected: 200 OK"
+          }
+        },
+        {
+          "name": "AI Question",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/ask?q=Which city contributes the highest sales?",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "ask"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "Which city contributes the highest sales?"
+                }
+              ]
+            },
+            "description": "Expected: 200 OK"
+          }
+        },
+        {
+          "name": "Download CSV Should Be Blocked",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/download/raw-input",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "download",
+                "raw-input"
+              ]
+            },
+            "description": "Expected: 403 Forbidden"
+          }
+        },
+        {
+          "name": "API Docs Should Be Blocked",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v3/api-docs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v3",
+                "api-docs"
+              ]
+            },
+            "description": "Expected: 403 Forbidden"
+          }
         }
-      }
+      ]
     },
     {
-      "name": "Download CSV",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/download/raw-input",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "download",
-            "raw-input"
-          ]
+      "name": "Admin Access",
+      "description": "Requests using the ADMIN account. Replace the admin variables after import.",
+      "auth": {
+        "type": "basic",
+        "basic": [
+          {
+            "key": "username",
+            "value": "{{adminUsername}}",
+            "type": "string"
+          },
+          {
+            "key": "password",
+            "value": "{{adminPassword}}",
+            "type": "string"
+          }
+        ]
+      },
+      "item": [
+        {
+          "name": "Filter Options",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/filter-options",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "filter-options"
+              ]
+            },
+            "description": "Expected: 200 OK"
+          }
+        },
+        {
+          "name": "Dashboard Summary",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "dashboard"
+              ]
+            },
+            "description": "Expected: 200 OK"
+          }
+        },
+        {
+          "name": "Download CSV",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/download/raw-input",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "download",
+                "raw-input"
+              ]
+            },
+            "description": "Expected: 200 OK"
+          }
+        },
+        {
+          "name": "API Docs",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v3/api-docs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v3",
+                "api-docs"
+              ]
+            },
+            "description": "Expected: 200 OK"
+          }
         }
-      }
+      ]
     }
   ]
 }
