@@ -193,11 +193,16 @@ APP_SECURITY_USER_PASSWORD=your-user-password
 
 ### API Privacy Defaults
 
-The secured dashboard and login page use the browser session flow, but protected API paths now behave more like APIs:
+The project now uses two authentication flows on purpose:
+
+- browser users sign in through `/login` and use the protected dashboard session
+- API clients sign in through `POST /api/auth/login` and use a bearer token
+
+Protected API paths behave like APIs:
 
 - anonymous requests to `/api/**`, `/download/**`, and `/v3/api-docs/**` return `401 Unauthorized`
-- browser users can still authenticate through `/login` and then access the same protected resources
-- same-origin dashboard calls work by default without any extra CORS setup
+- same-origin dashboard calls still work through the browser login session
+- Postman and similar API tools should use the bearer token flow, not browser cookies
 
 ### Role Access
 
@@ -218,6 +223,43 @@ Cookie defaults are also tightened:
 server.servlet.session.cookie.http-only=true
 server.servlet.session.cookie.same-site=lax
 ```
+
+### API Authentication Flow
+
+For API tools such as Postman:
+
+1. `POST /api/auth/login` with JSON credentials
+2. copy the returned `accessToken`
+3. send `Authorization: Bearer <accessToken>` on protected API requests
+
+Example login request:
+
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "username": "user",
+  "password": "user-123"
+}
+```
+
+Example successful response:
+
+```json
+{
+  "accessToken": "token-value",
+  "tokenType": "Bearer",
+  "username": "user",
+  "roles": ["ROLE_USER"],
+  "expiresAt": "2026-06-03T12:00:00Z"
+}
+```
+
+API logout is also available:
+
+- `POST /api/auth/logout`
+  Revokes the current bearer token when sent with `Authorization: Bearer <accessToken>`.
 
 ### Run The Frontend
 
@@ -265,6 +307,22 @@ Manual API requests can also be explored with:
 
 - `postman/RetailProject.postman_collection.json`
 
+Recommended Postman flow:
+
+1. import the collection
+2. set collection variables for `baseUrl`, `userUsername`, `userPassword`, `adminUsername`, and `adminPassword`
+3. run `API Login -> User Login` or `API Login -> Admin Login`
+4. let the collection save `userToken` or `adminToken`
+5. call the protected requests with the saved bearer token
+
+Expected examples:
+
+- `User Access -> Filter Options` -> `200`
+- `User Access -> Dashboard Summary` -> `200`
+- `User Access -> Download CSV Should Be Blocked` -> `403`
+- `Admin Access -> API Docs` -> `200`
+- `Anonymous Access -> Filter Options Without Token` -> `401`
+
 ## Generated Folders
 
 These folders are runtime or build artifacts and are not part of the source structure:
@@ -304,6 +362,7 @@ The recommended deployment is now a single secured Spring Boot web service. The 
 - Runtime CSV exports are regenerated into `output/` when the application starts.
 - Maven wrapper caches and build artifacts are isolated to project-local generated folders.
 - Anonymous API access is blocked. Protected API and download routes return `401`, while dashboard users authenticate through the `/login` page.
+- Browser login and API login are intentionally separated so dashboard sessions and Postman testing do not interfere with each other.
 - Cross-origin access is deny-by-default and must be explicitly allowlisted through `APP_SECURITY_ALLOWED_ORIGINS`.
 
 ## Tech Stack
