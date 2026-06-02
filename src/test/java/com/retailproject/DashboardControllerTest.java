@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,6 +76,13 @@ class DashboardControllerTest {
                 .andExpect(jsonPath("$.paymentMethods").isArray())
                 .andExpect(jsonPath("$.statuses").isArray())
                 .andExpect(jsonPath("$.customers").isArray());
+    }
+
+    @Test
+    void filterOptionsSupportsBasicAuthWithConfiguredUser() throws Exception {
+        mockMvc.perform(get("/api/filter-options").with(httpBasic("admin", "change-me-now")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.cities").isArray());
     }
 
     @Test
