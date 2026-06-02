@@ -8,7 +8,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,16 +17,15 @@ public class AppUserDetailsService implements UserDetailsService {
 
     public AppUserDetailsService(
             AppSecurityProperties properties,
-            PasswordEncoder passwordEncoder,
             LoginAttemptService loginAttemptService) {
         this.loginAttemptService = loginAttemptService;
         this.usersByUsername = new HashMap<>();
         usersByUsername.put(properties.username(), User.withUsername(properties.username())
-                .password(passwordEncoder.encode(properties.password()))
+                .password(normalizePassword(properties.password()))
                 .roles("USER", "ADMIN")
                 .build());
         usersByUsername.put(properties.userUsername(), User.withUsername(properties.userUsername())
-                .password(passwordEncoder.encode(properties.userPassword()))
+                .password(normalizePassword(properties.userPassword()))
                 .roles("USER")
                 .build());
     }
@@ -43,5 +41,12 @@ public class AppUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("User not found");
         }
         return user;
+    }
+
+    private String normalizePassword(String configuredPassword) {
+        if (configuredPassword == null || configuredPassword.isBlank()) {
+            throw new IllegalArgumentException("Configured security password must not be blank.");
+        }
+        return configuredPassword.startsWith("{") ? configuredPassword : "{noop}" + configuredPassword;
     }
 }
