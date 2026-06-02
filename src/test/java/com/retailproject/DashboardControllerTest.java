@@ -6,12 +6,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
@@ -21,6 +24,47 @@ class DashboardControllerTest {
     private MockMvc mockMvc;
 
     @Test
+    void protectedApiRejectsAnonymousUsers() throws Exception {
+        mockMvc.perform(get("/api/filter-options"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void loginPageShowsInvalidCredentialsMessage() throws Exception {
+        mockMvc.perform(get("/login").param("error", "invalid"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Invalid username or password.")));
+    }
+
+    @Test
+    void invalidLoginRedirectsBackToLoginWithError() throws Exception {
+        mockMvc.perform(formLogin().user("wrong-user").password("wrong-password"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/login?error=invalid"));
+    }
+
+    @Test
+    void repeatedInvalidLoginsTriggerTemporaryLockout() throws Exception {
+        for (int i = 0; i < 2; i++) {
+            mockMvc.perform(formLogin().user("analyst").password("bad-password"))
+                    .andExpect(status().is3xxRedirection())
+                    .andExpect(redirectedUrl("/login?error=invalid"));
+        }
+
+        mockMvc.perform(formLogin().user("analyst").password("bad-password"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/login?error=locked"));
+    }
+
+    @Test
+    void loginPageShowsLockoutMessage() throws Exception {
+        mockMvc.perform(get("/login").param("error", "locked"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("temporarily locked for 5 minutes")));
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
     void filterOptionsReturnsAvailableFilters() throws Exception {
         mockMvc.perform(get("/api/filter-options"))
                 .andExpect(status().isOk())
@@ -34,6 +78,7 @@ class DashboardControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     void dashboardReturnsSummaryAndCharts() throws Exception {
         mockMvc.perform(get("/api/dashboard"))
                 .andExpect(status().isOk())
@@ -46,6 +91,7 @@ class DashboardControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     void dashboardAcceptsFilters() throws Exception {
         mockMvc.perform(get("/api/dashboard")
                         .param("city", "Mumbai")
@@ -56,6 +102,7 @@ class DashboardControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     void tableReturnsPagedRows() throws Exception {
         mockMvc.perform(get("/api/table")
                         .param("name", "raw-input")
@@ -70,6 +117,7 @@ class DashboardControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "USER")
     void askReturnsAnswerPayload() throws Exception {
         mockMvc.perform(get("/api/ask")
                         .param("q", "Which city contributes the highest sales?"))
@@ -81,10 +129,32 @@ class DashboardControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void downloadReturnsCsvAttachment() throws Exception {
         mockMvc.perform(get("/download/raw-input"))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Disposition", "attachment; filename=\"retail.csv\""))
                 .andExpect(content().contentType("text/csv;charset=UTF-8"));
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void downloadIsForbiddenForRegularUsers() throws Exception {
+        mockMvc.perform(get("/download/raw-input"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void swaggerDocsAreForbiddenForRegularUsers() throws Exception {
+        mockMvc.perform(get("/v3/api-docs"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void dashboardHomeRedirectsIntoProtectedDashboard() throws Exception {
+        mockMvc.perform(get("/"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(header().string("Location", "/dashboard/index.html"));
     }
 }

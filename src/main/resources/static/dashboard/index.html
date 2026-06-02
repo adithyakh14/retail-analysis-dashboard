@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retail Performance Intelligence Dashboard</title>
+    <link rel="stylesheet" href="/dashboard/styles.css">
+</head>
+<body>
+    <div class="page-shell">
+        <header class="hero">
+            <div class="hero-copy">
+                <p class="eyebrow">Executive Retail Analytics</p>
+                <h1>Retail Performance Intelligence Dashboard</h1>
+                <p class="hero-text">
+                    A focused business dashboard for revenue, demand, customer behavior, product performance,
+                    discount impact, and market-level insight from the retail dataset.
+                </p>
+            </div>
+            <div class="hero-metrics">
+                <div class="hero-metric">
+                    <span>Data Refreshed</span>
+                    <strong id="refreshedAt">Loading...</strong>
+                </div>
+                <div class="hero-metric">
+                    <span>Total Records</span>
+                    <strong id="overallRecordCount">0</strong>
+                </div>
+                <div class="hero-metric">
+                    <span>Filtered Records</span>
+                    <strong id="filteredRecordCount">0</strong>
+                </div>
+            </div>
+        </header>
+
+        <section class="filter-panel">
+            <div class="filter-panel__head">
+                <div>
+                    <h2>Business Filters</h2>
+                    <p>Apply a common slice across every metric, visual, and AI answer.</p>
+                </div>
+                <div class="session-actions">
+                    <a class="ghost-button" href="/swagger-ui.html">Swagger</a>
+                    <form method="post" action="/logout" id="logoutForm">
+                        <input type="hidden" name="_csrf" id="logoutCsrfToken">
+                        <button type="submit" class="ghost-button logout-button">Sign Out</button>
+                    </form>
+                </div>
+            </div>
+            <div class="filters-grid">
+                <label><span>From Date</span><select id="dateFrom"></select></label>
+                <label><span>To Date</span><select id="dateTo"></select></label>
+                <label><span>City</span><select id="city"></select></label>
+                <label><span>Category</span><select id="category"></select></label>
+                <label><span>Product</span><select id="product"></select></label>
+                <label><span>Payment Method</span><select id="paymentMethod"></select></label>
+                <label><span>Customer</span><select id="customer"></select></label>
+                <label><span>Order Status</span><select id="status"></select></label>
+            </div>
+        </section>
+
+        <main class="content-grid">
+            <section class="panel panel-wide">
+                <div class="section-heading">
+                    <div>
+                        <h2>Executive Summary</h2>
+                        <p>Core numbers a business owner should review first.</p>
+                    </div>
+                </div>
+                <div id="summaryCards" class="summary-grid"></div>
+            </section>
+
+            <section class="panel panel-wide dual-panel">
+                <div>
+                    <div class="section-heading">
+                        <div>
+                            <h2>Top Insights</h2>
+                            <p>Plain-language signals from the current business slice.</p>
+                        </div>
+                    </div>
+                    <div id="topInsights" class="insight-list"></div>
+                </div>
+                <div>
+                    <div class="section-heading">
+                        <div>
+                            <h2>Watchouts</h2>
+                            <p>Concentration, discount, and low-performance risks.</p>
+                        </div>
+                    </div>
+                    <div id="watchouts" class="insight-list"></div>
+                </div>
+            </section>
+
+            <section class="panel panel-wide">
+                <div class="section-heading">
+                    <div>
+                        <h2>Revenue Trend</h2>
+                        <p>How performance moves over time for the selected slice.</p>
+                    </div>
+                    <button id="clearTrendFocus" class="ghost-button" hidden>Back To Previous View</button>
+                </div>
+                <div id="trendNarrative" class="trend-narrative"></div>
+                <div id="trendHighlights" class="trend-highlights"></div>
+                <div id="trendChart" class="line-chart"></div>
+            </section>
+
+            <section class="panel">
+                <div class="section-heading">
+                    <div>
+                        <h2>Category Performance</h2>
+                        <p>Which categories are carrying the business.</p>
+                    </div>
+                </div>
+                <div id="categoryChart" class="bar-chart"></div>
+            </section>
+
+            <section class="panel">
+                <div class="section-heading">
+                    <div>
+                        <h2>Market Performance</h2>
+                        <p>Revenue by city to identify strong and weak markets.</p>
+                    </div>
+                </div>
+                <div id="cityChart" class="bar-chart"></div>
+            </section>
+
+            <section class="panel">
+                <div class="section-heading">
+                    <div>
+                        <h2>Top Products</h2>
+                        <p>Products generating the most value.</p>
+                    </div>
+                </div>
+                <div id="topProductChart" class="bar-chart"></div>
+            </section>
+
+            <section class="panel">
+                <div class="section-heading">
+                    <div>
+                        <h2>Bottom Products</h2>
+                        <p>Products that may need attention or repositioning.</p>
+                    </div>
+                </div>
+                <div id="bottomProductChart" class="bar-chart"></div>
+            </section>
+
+            <section class="panel">
+                <div class="section-heading">
+                    <div>
+                        <h2>Top Customers</h2>
+                        <p>High-value buyers and their contribution.</p>
+                    </div>
+                </div>
+                <div id="customerChart" class="bar-chart"></div>
+            </section>
+
+            <section class="panel">
+                <div class="section-heading">
+                    <div>
+                        <h2>Payment Performance</h2>
+                        <p>How revenue is distributed across payment methods.</p>
+                    </div>
+                </div>
+                <div id="paymentChart" class="bar-chart"></div>
+            </section>
+
+            <section class="panel">
+                <div class="section-heading">
+                    <div>
+                        <h2>Discount Impact</h2>
+                        <p>Average discount level by category.</p>
+                    </div>
+                </div>
+                <div id="discountChart" class="bar-chart"></div>
+            </section>
+
+            <section class="panel">
+                <div class="section-heading">
+                    <div>
+                        <h2>Category Contribution</h2>
+                        <p>Share of total sales from the leading categories.</p>
+                    </div>
+                </div>
+                <div class="table-wrapper compact">
+                    <table id="categoryContributionTable"></table>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="section-heading">
+                    <div>
+                        <h2>City Contribution</h2>
+                        <p>Share of total sales from the leading markets.</p>
+                    </div>
+                </div>
+                <div class="table-wrapper compact">
+                    <table id="cityContributionTable"></table>
+                </div>
+            </section>
+
+            <section class="panel panel-wide">
+                <div class="section-heading">
+                    <div>
+                        <h2>AI Business Assistant</h2>
+                        <p>Ask open business questions about revenue, customers, products, discounts, trends, or risks.</p>
+                    </div>
+                </div>
+                <div class="ai-box">
+                    <div id="suggestions" class="suggestions"></div>
+                    <div class="ai-input-row">
+                        <input id="aiQuestion" type="text" placeholder="Example: Which city is underperforming and which category is driving revenue?">
+                        <button id="askButton">Ask</button>
+                    </div>
+                    <div class="ai-response-grid">
+                        <article class="ai-card">
+                            <span>Answer</span>
+                            <div id="aiAnswer" class="ai-answer">Answers will appear here.</div>
+                        </article>
+                        <article class="ai-card">
+                            <span>Interpretation</span>
+                            <div id="aiInterpretation" class="ai-answer">Business context will appear here.</div>
+                        </article>
+                    </div>
+                    <div id="aiChartWrap" class="ai-chart-wrap">
+                        <div class="section-heading compact-heading">
+                            <div>
+                                <h3>Visual Support</h3>
+                                <p>Generated when the question benefits from a chart.</p>
+                            </div>
+                        </div>
+                        <div id="aiChart" class="bar-chart"></div>
+                    </div>
+                    <div class="table-wrapper compact">
+                        <table id="aiTable"></table>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel panel-wide">
+                <div class="section-heading">
+                    <div>
+                        <h2>Data Explorer</h2>
+                        <p>Inspect raw and transformed tables when you need detail behind the insights.</p>
+                    </div>
+                </div>
+                <div class="table-toolbar">
+                    <div id="tableTabs" class="table-tabs"></div>
+                    <div class="table-actions">
+                        <input id="tableSearch" type="search" placeholder="Search current table">
+                        <a id="downloadTable" class="ghost-button" href="#">Download CSV</a>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table id="dataTable"></table>
+                </div>
+                <div class="pagination">
+                    <button id="prevPage" class="ghost-button">Previous</button>
+                    <span id="pageLabel">Page 1</span>
+                    <button id="nextPage" class="ghost-button">Next</button>
+                </div>
+            </section>
+
+            <section class="panel panel-wide">
+                <div class="section-heading">
+                    <div>
+                        <h2>Methodology</h2>
+                        <p>Definitions to keep the dashboard interpretable and trustworthy.</p>
+                    </div>
+                </div>
+                <div class="method-grid">
+                    <article>
+                        <h3>Total Revenue</h3>
+                        <p>Sum of sales after discount across the selected records.</p>
+                    </article>
+                    <article>
+                        <h3>Average Order Value</h3>
+                        <p>Total revenue divided by distinct order count.</p>
+                    </article>
+                    <article>
+                        <h3>Average Discount</h3>
+                        <p>Simple average of discount percentages in the selected records.</p>
+                    </article>
+                    <article>
+                        <h3>Contribution</h3>
+                        <p>Share of total filtered revenue attributed to a category, city, product, or customer.</p>
+                    </article>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/dashboard/app.js"></script>
+</body>
+</html>

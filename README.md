@@ -1,17 +1,6 @@
 # Retail Analysis Dashboard
 
-Retail Analysis Dashboard is an API-first Spring Boot backend with a separate browser frontend. It reads a CSV dataset, builds an in-memory warehouse-style model, generates report exports, exposes typed REST APIs, and supports a standalone dashboard client that consumes those APIs.
-
-## Live Deployment
-
-- Frontend dashboard:
-  `https://retail-analysis-dashboard-frontend.onrender.com`
-- Backend API:
-  `https://retail-analysis-dashboard.onrender.com`
-
-Client-facing link:
-
-`https://retail-analysis-dashboard-frontend.onrender.com`
+Retail Analysis Dashboard is a secured Spring Boot application that serves a protected browser dashboard and its backing REST APIs from the same runtime. It reads a CSV dataset, builds an in-memory warehouse-style model, generates report exports, and exposes typed endpoints behind authenticated access.
 
 ## What The Project Does
 
@@ -19,7 +8,7 @@ Client-facing link:
 - Converts the raw rows into fact and dimension structures
 - Calculates KPIs, trend summaries, contribution tables, and insight cards
 - Exposes dashboard data through REST endpoints
-- Provides a standalone frontend client in `frontend/`
+- Serves a protected dashboard UI from the backend at `/dashboard/`
 - Generates downloadable CSV outputs for raw and transformed data
 
 ## Architecture
@@ -28,7 +17,7 @@ This project has one supported runtime: a Spring Boot application started from `
 
 The end-to-end flow is:
 
-`retail.csv` -> `RetailRecord` objects -> warehouse model -> filtered aggregations -> REST API -> standalone dashboard UI
+`retail.csv` -> `RetailRecord` objects -> warehouse model -> filtered aggregations -> secured REST API -> protected dashboard UI
 
 ### Runtime Layers
 
@@ -48,8 +37,10 @@ The end-to-end flow is:
   Writes the consolidated analytics export.
 - `src/main/java/com/retailproject/RetailWarehouseWriter.java`
   Writes the fact and dimension CSV outputs.
+- `src/main/resources/static/dashboard/`
+  Protected dashboard assets served by Spring Boot after login.
 - `frontend/`
-  Standalone frontend that calls the backend API over HTTP.
+  Legacy standalone frontend source kept for reference during development.
 
 ### Data Model
 
@@ -80,8 +71,10 @@ Warehouse-style output generated into `output/` at runtime:
   Returns an answer, interpretation, and optional chart or table for a business question.
 - `GET /download/{name}`
   Downloads a CSV file for the selected raw or generated table.
+- `GET /login`
+  Custom login page for dashboard and API access.
 - `GET /swagger-ui.html`
-  Interactive API documentation.
+  Interactive API documentation, protected by login.
 
 Supported dashboard filters:
 
@@ -158,15 +151,83 @@ Backend API:
 http://localhost:8080
 ```
 
+Protected dashboard:
+
+```text
+http://localhost:8080/dashboard/
+```
+
+Login page:
+
+```text
+http://localhost:8080/login
+```
+
 Swagger UI:
 
 ```text
 http://localhost:8080/swagger-ui.html
 ```
 
+### Default Credentials
+
+The application now requires login for the dashboard, APIs, downloads, and Swagger.
+
+Local defaults are in `src/main/resources/application.properties`:
+
+```text
+admin username: admin
+admin password: change-me-now
+user username: analyst
+user password: change-me-user
+```
+
+Override them before deployment with environment variables:
+
+```text
+APP_SECURITY_USERNAME=your-admin-username
+APP_SECURITY_PASSWORD=your-admin-password
+APP_SECURITY_USER_USERNAME=your-user-username
+APP_SECURITY_USER_PASSWORD=your-user-password
+```
+
+### API Privacy Defaults
+
+The secured dashboard and login page use the browser session flow, but protected API paths now behave more like APIs:
+
+- anonymous requests to `/api/**`, `/download/**`, and `/v3/api-docs/**` return `401 Unauthorized`
+- browser users can still authenticate through `/login` and then access the same protected resources
+- same-origin dashboard calls work by default without any extra CORS setup
+
+### Role Access
+
+- `USER`
+  Can access the dashboard and standard `/api/**` endpoints.
+- `ADMIN`
+  Can access everything a `USER` can, plus `/download/**`, `/swagger-ui.html`, `/swagger-ui/**`, and `/v3/api-docs/**`.
+
+Cross-origin API access is disabled unless you explicitly allow trusted origins:
+
+```text
+APP_SECURITY_ALLOWED_ORIGINS=https://your-frontend.example.com,https://admin.yourcompany.com
+```
+
+Cookie defaults are also tightened:
+
+```text
+server.servlet.session.cookie.http-only=true
+server.servlet.session.cookie.same-site=lax
+```
+
 ### Run The Frontend
 
-After the backend is running, open:
+The recommended frontend is now the protected backend-served dashboard:
+
+- `http://localhost:8080/dashboard/`
+
+The old standalone file-based frontend still exists in `frontend/`, but it is no longer the primary access path.
+
+If you still open it directly:
 
 - `frontend/index.html`
 
@@ -196,7 +257,7 @@ Primary automated coverage is in:
 
 - `src/test/java/com/retailproject/DashboardControllerTest.java`
 
-These tests exercise the main REST endpoints and basic response contracts.
+These tests exercise the protected REST endpoints and their basic response contracts.
 
 ## API Exploration
 
@@ -232,43 +293,18 @@ The container builds the Spring Boot jar in a Maven stage and runs it on Java 21
 
 ### Frontend And Backend On Render
 
-The deployed setup uses two Render services:
-
-- a `Static Site` for the frontend dashboard
-- a `Web Service` for the Spring Boot backend API
-
-The frontend should be treated as the main user-facing deliverable. The backend URL is primarily for API access, Swagger, and technical testing.
-
-### Avoiding The Whitelabel Error Page
-
-If someone opens the backend root URL directly, the project now redirects to the deployed frontend when `app.frontend-url` is configured. Otherwise it shows a friendly landing page instead of Spring Boot's default error page.
-
-If you want the backend root URL to open the deployed frontend automatically, configure:
-
-```text
-app.frontend-url=https://your-frontend-url
-```
-
-On Render, this can be added as an environment variable:
-
-```text
-APP_FRONTEND_URL=https://your-frontend-url
-```
-
-Current deployed value:
-
-```text
-APP_FRONTEND_URL=https://retail-analysis-dashboard-frontend.onrender.com
-```
+The recommended deployment is now a single secured Spring Boot web service. The application root redirects to `/dashboard/`, which in turn requires login.
 
 ## Important Implementation Notes
 
-- The backend is API-only; the frontend is a separate client folder.
+- The protected dashboard is now served directly by Spring Boot.
 - The application is CSV-backed and does not use a database.
 - The warehouse is built in memory during startup.
 - The business assistant is rule-based logic inside `DashboardDataService`; it is not backed by an external LLM.
 - Runtime CSV exports are regenerated into `output/` when the application starts.
 - Maven wrapper caches and build artifacts are isolated to project-local generated folders.
+- Anonymous API access is blocked. Protected API and download routes return `401`, while dashboard users authenticate through the `/login` page.
+- Cross-origin access is deny-by-default and must be explicitly allowlisted through `APP_SECURITY_ALLOWED_ORIGINS`.
 
 ## Tech Stack
 
