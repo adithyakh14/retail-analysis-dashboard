@@ -1,16 +1,12 @@
 package com.retailproject;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.retailproject.dto.AskRequest;
 import com.retailproject.dto.DashboardFilterRequest;
 import com.retailproject.dto.TableRequest;
-import com.retailproject.dto.response.AskResponse;
-import com.retailproject.dto.response.DashboardResponse;
-import com.retailproject.dto.response.FilterOptionsResponse;
-import com.retailproject.dto.response.TableResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.Map;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -26,39 +22,33 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Retail Dashboard", description = "Backend APIs for the retail analytics dashboard")
 public class DashboardController {
     private final DashboardDataService dataService;
-    private final ObjectMapper objectMapper;
 
-    public DashboardController(DashboardDataService dataService, ObjectMapper objectMapper) {
+    public DashboardController(DashboardDataService dataService) {
         this.dataService = dataService;
-        this.objectMapper = objectMapper;
     }
 
     @GetMapping("/api/dashboard")
     @Operation(summary = "Get dashboard data", description = "Returns summary cards, charts, trend data, insights, and contribution tables.")
-    public DashboardResponse getDashboard(@ModelAttribute DashboardFilterRequest request) {
-        return objectMapper.convertValue(dataService.getDashboardData(request.toFilterMap()), DashboardResponse.class);
+    public Map<String, Object> getDashboard(@ModelAttribute DashboardFilterRequest request) {
+        return dataService.getDashboardData(request.toFilterMap());
     }
 
     @GetMapping("/api/filter-options")
     @Operation(summary = "Get filter options", description = "Returns all available values for frontend filters.")
-    public FilterOptionsResponse getFilterOptions() {
-        return objectMapper.convertValue(dataService.getFilterOptions(), FilterOptionsResponse.class);
+    public Map<String, Object> getFilterOptions() {
+        return dataService.getFilterOptions();
     }
 
     @GetMapping("/api/table")
     @Operation(summary = "Get table data", description = "Returns paginated tabular data for a named source table.")
-    public TableResponse getTable(@ModelAttribute TableRequest request) {
-        return objectMapper.convertValue(
-                dataService.getTable(request.resolvedName(), request.toQueryMap()),
-                TableResponse.class);
+    public Map<String, Object> getTable(@ModelAttribute TableRequest request) {
+        return dataService.getTable(request.resolvedName(), request.toQueryMap());
     }
 
     @GetMapping("/api/ask")
     @Operation(summary = "Ask a business question", description = "Returns an answer, interpretation, and optional chart or table based on the current filtered dataset.")
-    public AskResponse askQuestion(@ModelAttribute AskRequest request) {
-        return objectMapper.convertValue(
-                dataService.askQuestion(request.resolvedQuestion(), request.toQueryMap()),
-                AskResponse.class);
+    public Map<String, Object> askQuestion(@ModelAttribute AskRequest request) {
+        return dataService.askQuestion(request.resolvedQuestion(), request.toQueryMap());
     }
 
     @GetMapping("/download/{name}")
