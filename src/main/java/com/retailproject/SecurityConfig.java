@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
@@ -65,7 +64,6 @@ public class SecurityConfig {
     @Bean
     PasswordEncoder passwordEncoder() {
         PasswordEncoder delegating = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-        PasswordEncoder noop = NoOpPasswordEncoder.getInstance();
 
         return new PasswordEncoder() {
             @Override
@@ -81,7 +79,7 @@ public class SecurityConfig {
                 if (encodedPassword.startsWith("{")) {
                     return delegating.matches(rawPassword, encodedPassword);
                 }
-                return noop.matches(rawPassword, encodedPassword);
+                return encodedPassword.contentEquals(rawPassword);
             }
         };
     }
