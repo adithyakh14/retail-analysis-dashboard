@@ -1,4 +1,4 @@
-package com.retailproject;
+package com.retailproject.security;
 
 import java.time.Duration;
 import java.time.Instant;

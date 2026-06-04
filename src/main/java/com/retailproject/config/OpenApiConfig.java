@@ -1,4 +1,4 @@
-package com.retailproject;
+package com.retailproject.config;
 
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiConfig {
     @Bean
-    public OpenAPI retailProjectOpenApi() {
+    OpenAPI retailProjectOpenApi() {
         return new OpenAPI()
                 .info(new Info()
                         .title("RetailProject API")

@@ -23,10 +23,14 @@ The end-to-end flow is:
 
 - `src/main/java/com/retailproject/RetailProjectApplication.java`
   Spring Boot entry point.
-- `src/main/java/com/retailproject/DashboardController.java`
+- `src/main/java/com/retailproject/web/DashboardController.java`
   HTTP layer for dashboard, filter, table, ask, and download endpoints.
 - `src/main/java/com/retailproject/DashboardDataService.java`
   Core application service. Loads data once, builds analytics, writes CSV outputs, and answers API requests.
+- `src/main/java/com/retailproject/security/`
+  Authentication, lockout, bearer-token, and audit components.
+- `src/main/java/com/retailproject/config/`
+  Security and OpenAPI configuration, plus typed application properties.
 - `src/main/java/com/retailproject/RetailDataReader.java`
   Reads the source CSV into domain records.
 - `src/main/java/com/retailproject/RetailWarehouseBuilder.java`
@@ -113,9 +117,11 @@ RetailProject/
 `-- src/
     |-- main/
     |   |-- java/com/retailproject/
+    |   |   |-- config/
     |   |   |-- dto/
     |   |   |-- dto/response/
-    |   |   |-- DashboardController.java
+    |   |   |-- security/
+    |   |   |-- web/
     |   |   |-- DashboardDataService.java
     |   |   |-- RetailProjectApplication.java
     |   |   `-- warehouse and writer classes
@@ -370,6 +376,7 @@ The recommended deployment is now a single secured Spring Boot web service. The 
 - Java 21
 - Spring Boot 3
 - Spring MVC
+- Spring Validation
 - springdoc OpenAPI / Swagger UI
 - Lombok
 - HTML

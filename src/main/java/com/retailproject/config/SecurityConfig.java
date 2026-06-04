@@ -1,7 +1,9 @@
-package com.retailproject;
+package com.retailproject.config;
 
+import com.retailproject.security.ApiTokenAuthenticationFilter;
+import com.retailproject.security.CustomAuthenticationFailureHandler;
+import com.retailproject.security.SecurityAuditFilter;
 import java.util.List;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -98,7 +100,7 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource(AppSecurityProperties properties) {
         CorsConfiguration configuration = new CorsConfiguration();
-        List<String> allowedOrigins = properties.allowedOrigins() == null ? List.of() : properties.allowedOrigins();
+        List<String> allowedOrigins = properties.allowedOrigins();
 
         configuration.setAllowedOrigins(allowedOrigins);
         configuration.setAllowedMethods(List.of("GET", "OPTIONS"));

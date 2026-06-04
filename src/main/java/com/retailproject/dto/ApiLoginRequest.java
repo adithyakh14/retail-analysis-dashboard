@@ -1,4 +1,6 @@
 package com.retailproject.dto;
 
-public record ApiLoginRequest(String username, String password) {
+import jakarta.validation.constraints.NotBlank;
+
+public record ApiLoginRequest(@NotBlank String username, @NotBlank String password) {
 }

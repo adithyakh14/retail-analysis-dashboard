@@ -1,5 +1,6 @@
-package com.retailproject;
+package com.retailproject.security;
 
+import com.retailproject.config.AppSecurityProperties;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;

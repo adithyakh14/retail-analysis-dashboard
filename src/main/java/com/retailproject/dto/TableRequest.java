@@ -1,5 +1,6 @@
 package com.retailproject.dto;
 
+import jakarta.validation.constraints.Positive;
 import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +9,9 @@ import lombok.Setter;
 @Setter
 public class TableRequest extends DashboardFilterRequest {
     private String name = "raw-input";
+    @Positive
     private Integer page = 1;
+    @Positive
     private Integer pageSize = 10;
     private String search = "";
 
