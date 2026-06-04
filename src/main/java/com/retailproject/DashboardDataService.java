@@ -22,6 +22,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class DashboardDataService {
+    private static final String OUTPUT_DIRECTORY_NAME = "output";
+    private static final String RETAIL_DATASET_RESOURCE = "retail.csv";
+    private static final String RETAIL_RESULTS_FILE = "RetailResults.csv";
     private static final List<String> SUGGESTED_QUESTIONS = List.of(
             "Which city contributes the highest sales?",
             "Show the bottom 5 products by revenue.",
@@ -33,16 +36,23 @@ public class DashboardDataService {
     private final List<RetailRecord> records;
     private final RetailWarehouse warehouse;
     private final RetailWarehouseAnalyzer analyzer;
+    private final RetailResultsWriter resultsWriter;
+    private final RetailWarehouseWriter warehouseWriter;
     private final Path outputDirectory;
     private final String refreshedAt;
 
-    public DashboardDataService() throws IOException {
-        RetailDataReader dataReader = new RetailDataReader();
-        RetailWarehouseBuilder warehouseBuilder = new RetailWarehouseBuilder();
-        this.analyzer = new RetailWarehouseAnalyzer();
-        this.records = dataReader.readRecordsFromResource("retail.csv");
+    public DashboardDataService(
+            RetailDataReader dataReader,
+            RetailWarehouseBuilder warehouseBuilder,
+            RetailWarehouseAnalyzer analyzer,
+            RetailResultsWriter resultsWriter,
+            RetailWarehouseWriter warehouseWriter) throws IOException {
+        this.analyzer = analyzer;
+        this.resultsWriter = resultsWriter;
+        this.warehouseWriter = warehouseWriter;
+        this.records = dataReader.readRecordsFromResource(RETAIL_DATASET_RESOURCE);
         this.warehouse = warehouseBuilder.buildWarehouse(records);
-        this.outputDirectory = Path.of("output");
+        this.outputDirectory = Path.of(OUTPUT_DIRECTORY_NAME);
         this.refreshedAt = LocalDateTime.now().format(REFRESH_FORMAT);
         Files.createDirectories(outputDirectory);
         writeOutputs();
@@ -383,7 +393,7 @@ public class DashboardDataService {
 
     public DownloadFile getDownloadFile(String name) {
         return switch (name) {
-            case "raw-input" -> new DownloadFile("retail.csv", readResourceBytes("retail.csv"));
+            case "raw-input" -> new DownloadFile(RETAIL_DATASET_RESOURCE, readResourceBytes(RETAIL_DATASET_RESOURCE));
             case "fact-sales" -> fileDownload("FactSales.csv");
             case "dim-date" -> fileDownload("DimDate.csv");
             case "dim-customer" -> fileDownload("DimCustomer.csv");
@@ -407,8 +417,8 @@ public class DashboardDataService {
         Map<String, Double> salesTrendByDate = analyzer.getSalesTrendByDate(warehouse);
         Map<String, Integer> orderCountByStatus = analyzer.getOrderCountByStatus(warehouse);
         Map<String, Double> salesByStatus = analyzer.getSalesByStatus(warehouse);
-        new RetailResultsWriter().writeResults(
-                outputDirectory.resolve("RetailResults.csv").toString(),
+        resultsWriter.writeResults(
+                outputDirectory.resolve(RETAIL_RESULTS_FILE),
                 analyzer.getDetailedRecords(warehouse),
                 uniqueCustomers,
                 uniqueProducts,
@@ -420,7 +430,7 @@ public class DashboardDataService {
                 salesTrendByDate,
                 orderCountByStatus,
                 salesByStatus);
-        new RetailWarehouseWriter().writeWarehouseTables(outputDirectory, warehouse);
+        warehouseWriter.writeWarehouseTables(outputDirectory, warehouse);
     }
 
     private List<RetailRecord> filterRecords(Map<String, String> filters) {
@@ -1310,7 +1320,7 @@ public class DashboardDataService {
 
     private CsvTable readTable(String name) {
         return switch (name) {
-            case "raw-input" -> parseCsv("Raw Input Retail CSV", readResourceText("retail.csv"));
+            case "raw-input" -> parseCsv("Raw Input Retail CSV", readResourceText(RETAIL_DATASET_RESOURCE));
             case "fact-sales" -> parseCsv("FactSales.csv", readFileText(outputDirectory.resolve("FactSales.csv")));
             case "dim-date" -> parseCsv("DimDate.csv", readFileText(outputDirectory.resolve("DimDate.csv")));
             case "dim-customer" -> parseCsv("DimCustomer.csv", readFileText(outputDirectory.resolve("DimCustomer.csv")));
@@ -1318,7 +1328,7 @@ public class DashboardDataService {
             case "dim-city" -> parseCsv("DimCity.csv", readFileText(outputDirectory.resolve("DimCity.csv")));
             case "dim-payment" -> parseCsv("DimPayment.csv", readFileText(outputDirectory.resolve("DimPayment.csv")));
             case "dim-status" -> parseCsv("DimStatus.csv", readFileText(outputDirectory.resolve("DimStatus.csv")));
-            case "retail-results" -> parseCsv("RetailResults.csv", readFileText(outputDirectory.resolve("RetailResults.csv")));
+            case "retail-results" -> parseCsv(RETAIL_RESULTS_FILE, readFileText(outputDirectory.resolve(RETAIL_RESULTS_FILE)));
             default -> throw new IllegalArgumentException("Unknown table: " + name);
         };
     }

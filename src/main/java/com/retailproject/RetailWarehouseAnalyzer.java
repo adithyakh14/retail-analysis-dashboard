@@ -7,7 +7,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import org.springframework.stereotype.Component;
 
+@Component
 public class RetailWarehouseAnalyzer {
     public List<RetailRecord> getDetailedRecords(RetailWarehouse warehouse) {
         Map<Integer, String> customerNames = getCustomerNames(warehouse);

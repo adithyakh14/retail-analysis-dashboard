@@ -1,15 +1,19 @@
 package com.retailproject;
 
 import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.springframework.stereotype.Component;
 
+@Component
 public class RetailResultsWriter {
     public void writeResults(
-            String filePath,
+            Path filePath,
             List<RetailRecord> records,
             Set<String> uniqueCustomers,
             Set<String> uniqueProducts,
@@ -21,7 +25,7 @@ public class RetailResultsWriter {
             Map<String, Double> salesTrendByDate,
             Map<String, Integer> orderCountByStatus,
             Map<String, Double> salesByStatus) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+        try (BufferedWriter writer = Files.newBufferedWriter(filePath, StandardCharsets.UTF_8)) {
             writer.write("Section,OrderID,OrderDate,Customer,City,Product,Category,Price,Quantity,Discount,PaymentMethod,OrderStatus,Sales");
             writer.newLine();
 

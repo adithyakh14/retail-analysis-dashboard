@@ -6,7 +6,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import org.springframework.stereotype.Component;
 
+@Component
 public class RetailWarehouseWriter {
     public void writeWarehouseTables(Path outputDirectory, RetailWarehouse warehouse) throws IOException {
         writeCustomers(outputDirectory.resolve("DimCustomer.csv"), warehouse);
