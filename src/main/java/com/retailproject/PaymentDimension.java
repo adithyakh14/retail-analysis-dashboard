@@ -1,11 +1,11 @@
 package com.retailproject;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+public record PaymentDimension(int paymentKey, String paymentMethod) {
+    public int getPaymentKey() {
+        return paymentKey;
+    }
 
-@Getter
-@RequiredArgsConstructor
-public class PaymentDimension {
-    private final int paymentKey;
-    private final String paymentMethod;
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
 }

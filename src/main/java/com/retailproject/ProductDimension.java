@@ -1,12 +1,15 @@
 package com.retailproject;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+public record ProductDimension(int productKey, String productName, String category) {
+    public int getProductKey() {
+        return productKey;
+    }
 
-@Getter
-@RequiredArgsConstructor
-public class ProductDimension {
-    private final int productKey;
-    private final String productName;
-    private final String category;
+    public String getProductName() {
+        return productName;
+    }
+
+    public String getCategory() {
+        return category;
+    }
 }

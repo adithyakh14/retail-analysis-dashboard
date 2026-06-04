@@ -16,12 +16,8 @@ public class RetailDataReader {
     public List<RetailRecord> readRecordsFromResource(String resourceName) throws IOException {
         List<RetailRecord> records = new ArrayList<>();
 
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourceName);
-        if (inputStream == null) {
-            throw new IOException("Resource not found: " + resourceName);
-        }
-
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+        try (InputStream inputStream = getRequiredResource(resourceName);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             reader.readLine();
             String line;
 
@@ -30,24 +26,7 @@ public class RetailDataReader {
                     continue;
                 }
 
-                String[] values = line.split(",");
-                if (values.length != 11) {
-                    throw new IOException("Invalid CSV row: " + line);
-                }
-
-                RetailRecord record = new RetailRecord(
-                        Integer.parseInt(values[0].trim()),
-                        values[1].trim(),
-                        values[2].trim(),
-                        values[3].trim(),
-                        values[4].trim(),
-                        values[5].trim(),
-                        Double.parseDouble(values[6].trim()),
-                        Integer.parseInt(values[7].trim()),
-                        Double.parseDouble(values[8].trim()),
-                        values[9].trim(),
-                        values[10].trim());
-                records.add(record);
+                records.add(parseRecord(line));
             }
         } catch (NumberFormatException e) {
             throw new IOException("Invalid number in CSV file", e);
@@ -119,5 +98,33 @@ public class RetailDataReader {
         }
 
         return ordersByCustomer;
+    }
+
+    private InputStream getRequiredResource(String resourceName) throws IOException {
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourceName);
+        if (inputStream == null) {
+            throw new IOException("Resource not found: " + resourceName);
+        }
+        return inputStream;
+    }
+
+    private RetailRecord parseRecord(String line) throws IOException {
+        String[] values = line.split(",");
+        if (values.length != 11) {
+            throw new IOException("Invalid CSV row: " + line);
+        }
+
+        return new RetailRecord(
+                Integer.parseInt(values[0].trim()),
+                values[1].trim(),
+                values[2].trim(),
+                values[3].trim(),
+                values[4].trim(),
+                values[5].trim(),
+                Double.parseDouble(values[6].trim()),
+                Integer.parseInt(values[7].trim()),
+                Double.parseDouble(values[8].trim()),
+                values[9].trim(),
+                values[10].trim());
     }
 }

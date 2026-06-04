@@ -1,9 +1,11 @@
 package com.retailproject;
 
 import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 public class RetailWarehouseWriter {
     public void writeWarehouseTables(Path outputDirectory, RetailWarehouse warehouse) throws IOException {
@@ -17,92 +19,69 @@ public class RetailWarehouseWriter {
     }
 
     private void writeCustomers(Path filePath, RetailWarehouse warehouse) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile()))) {
-            writer.write("CustomerKey,CustomerName");
-            writer.newLine();
-            for (CustomerDimension customer : warehouse.getCustomers()) {
-                writer.write(customer.getCustomerKey() + "," + customer.getCustomerName());
-                writer.newLine();
-            }
-        }
+        writeCsv(filePath, "CustomerKey,CustomerName", warehouse.getCustomers().stream()
+                .map(customer -> customer.getCustomerKey() + "," + customer.getCustomerName())
+                .toList());
     }
 
     private void writeProducts(Path filePath, RetailWarehouse warehouse) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile()))) {
-            writer.write("ProductKey,ProductName,Category");
-            writer.newLine();
-            for (ProductDimension product : warehouse.getProducts()) {
-                writer.write(product.getProductKey() + "," + product.getProductName() + "," + product.getCategory());
-                writer.newLine();
-            }
-        }
+        writeCsv(filePath, "ProductKey,ProductName,Category", warehouse.getProducts().stream()
+                .map(product -> product.getProductKey() + "," + product.getProductName() + "," + product.getCategory())
+                .toList());
     }
 
     private void writeDates(Path filePath, RetailWarehouse warehouse) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile()))) {
-            writer.write("DateKey,OrderDate,Year,Month,Quarter,DayOfWeek");
-            writer.newLine();
-            for (DateDimension date : warehouse.getDates()) {
-                writer.write(date.getDateKey()
+        writeCsv(filePath, "DateKey,OrderDate,Year,Month,Quarter,DayOfWeek", warehouse.getDates().stream()
+                .map(date -> date.getDateKey()
                         + "," + date.getOrderDate()
                         + "," + date.getYear()
                         + "," + date.getMonth()
                         + "," + date.getQuarter()
-                        + "," + date.getDayOfWeek());
-                writer.newLine();
-            }
-        }
+                        + "," + date.getDayOfWeek())
+                .toList());
     }
 
     private void writeCities(Path filePath, RetailWarehouse warehouse) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile()))) {
-            writer.write("CityKey,CityName");
-            writer.newLine();
-            for (CityDimension city : warehouse.getCities()) {
-                writer.write(city.getCityKey() + "," + city.getCityName());
-                writer.newLine();
-            }
-        }
+        writeCsv(filePath, "CityKey,CityName", warehouse.getCities().stream()
+                .map(city -> city.getCityKey() + "," + city.getCityName())
+                .toList());
     }
 
     private void writePayments(Path filePath, RetailWarehouse warehouse) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile()))) {
-            writer.write("PaymentKey,PaymentMethod");
-            writer.newLine();
-            for (PaymentDimension payment : warehouse.getPayments()) {
-                writer.write(payment.getPaymentKey() + "," + payment.getPaymentMethod());
-                writer.newLine();
-            }
-        }
+        writeCsv(filePath, "PaymentKey,PaymentMethod", warehouse.getPayments().stream()
+                .map(payment -> payment.getPaymentKey() + "," + payment.getPaymentMethod())
+                .toList());
     }
 
     private void writeStatuses(Path filePath, RetailWarehouse warehouse) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile()))) {
-            writer.write("StatusKey,OrderStatus");
-            writer.newLine();
-            for (StatusDimension status : warehouse.getStatuses()) {
-                writer.write(status.getStatusKey() + "," + status.getOrderStatus());
-                writer.newLine();
-            }
-        }
+        writeCsv(filePath, "StatusKey,OrderStatus", warehouse.getStatuses().stream()
+                .map(status -> status.getStatusKey() + "," + status.getOrderStatus())
+                .toList());
     }
 
     private void writeFacts(Path filePath, RetailWarehouse warehouse) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile()))) {
-            writer.write("OrderID,DateKey,CustomerKey,ProductKey,CityKey,PaymentKey,StatusKey,Price,Quantity,Discount,SalesAmount");
+        writeCsv(filePath, "OrderID,DateKey,CustomerKey,ProductKey,CityKey,PaymentKey,StatusKey,Price,Quantity,Discount,SalesAmount",
+                warehouse.getSalesFacts().stream()
+                        .map(fact -> fact.getOrderId()
+                                + "," + fact.getDateKey()
+                                + "," + fact.getCustomerKey()
+                                + "," + fact.getProductKey()
+                                + "," + fact.getCityKey()
+                                + "," + fact.getPaymentKey()
+                                + "," + fact.getStatusKey()
+                                + "," + fact.getPrice()
+                                + "," + fact.getQuantity()
+                                + "," + fact.getDiscount()
+                                + "," + fact.getSalesAmount())
+                        .toList());
+    }
+
+    private void writeCsv(Path filePath, String header, List<String> rows) throws IOException {
+        try (BufferedWriter writer = Files.newBufferedWriter(filePath, StandardCharsets.UTF_8)) {
+            writer.write(header);
             writer.newLine();
-            for (SalesFact fact : warehouse.getSalesFacts()) {
-                writer.write(fact.getOrderId()
-                        + "," + fact.getDateKey()
-                        + "," + fact.getCustomerKey()
-                        + "," + fact.getProductKey()
-                        + "," + fact.getCityKey()
-                        + "," + fact.getPaymentKey()
-                        + "," + fact.getStatusKey()
-                        + "," + fact.getPrice()
-                        + "," + fact.getQuantity()
-                        + "," + fact.getDiscount()
-                        + "," + fact.getSalesAmount());
+            for (String row : rows) {
+                writer.write(row);
                 writer.newLine();
             }
         }

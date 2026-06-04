@@ -1,11 +1,11 @@
 package com.retailproject;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+public record CityDimension(int cityKey, String cityName) {
+    public int getCityKey() {
+        return cityKey;
+    }
 
-@Getter
-@RequiredArgsConstructor
-public class CityDimension {
-    private final int cityKey;
-    private final String cityName;
+    public String getCityName() {
+        return cityName;
+    }
 }

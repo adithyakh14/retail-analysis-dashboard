@@ -1,20 +1,58 @@
 package com.retailproject;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+public record SalesFact(
+        int orderId,
+        int dateKey,
+        int customerKey,
+        int productKey,
+        int cityKey,
+        int paymentKey,
+        int statusKey,
+        double price,
+        int quantity,
+        double discount,
+        double salesAmount) {
+    public int getOrderId() {
+        return orderId;
+    }
 
-@Getter
-@RequiredArgsConstructor
-public class SalesFact {
-    private final int orderId;
-    private final int dateKey;
-    private final int customerKey;
-    private final int productKey;
-    private final int cityKey;
-    private final int paymentKey;
-    private final int statusKey;
-    private final double price;
-    private final int quantity;
-    private final double discount;
-    private final double salesAmount;
+    public int getDateKey() {
+        return dateKey;
+    }
+
+    public int getCustomerKey() {
+        return customerKey;
+    }
+
+    public int getProductKey() {
+        return productKey;
+    }
+
+    public int getCityKey() {
+        return cityKey;
+    }
+
+    public int getPaymentKey() {
+        return paymentKey;
+    }
+
+    public int getStatusKey() {
+        return statusKey;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public double getDiscount() {
+        return discount;
+    }
+
+    public double getSalesAmount() {
+        return salesAmount;
+    }
 }

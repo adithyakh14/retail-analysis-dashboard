@@ -1,11 +1,11 @@
 package com.retailproject;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+public record StatusDimension(int statusKey, String orderStatus) {
+    public int getStatusKey() {
+        return statusKey;
+    }
 
-@Getter
-@RequiredArgsConstructor
-public class StatusDimension {
-    private final int statusKey;
-    private final String orderStatus;
+    public String getOrderStatus() {
+        return orderStatus;
+    }
 }

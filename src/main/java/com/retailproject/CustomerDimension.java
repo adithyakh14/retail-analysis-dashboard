@@ -1,11 +1,11 @@
 package com.retailproject;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+public record CustomerDimension(int customerKey, String customerName) {
+    public int getCustomerKey() {
+        return customerKey;
+    }
 
-@Getter
-@RequiredArgsConstructor
-public class CustomerDimension {
-    private final int customerKey;
-    private final String customerName;
+    public String getCustomerName() {
+        return customerName;
+    }
 }

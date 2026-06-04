@@ -1,22 +1,60 @@
 package com.retailproject;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+public record RetailRecord(
+        int orderId,
+        String orderDate,
+        String customer,
+        String city,
+        String product,
+        String category,
+        double price,
+        int quantity,
+        double discount,
+        String paymentMethod,
+        String orderStatus) {
+    public int getOrderId() {
+        return orderId;
+    }
 
-@Getter
-@RequiredArgsConstructor
-public class RetailRecord {
-    private final int orderId;
-    private final String orderDate;
-    private final String customer;
-    private final String city;
-    private final String product;
-    private final String category;
-    private final double price;
-    private final int quantity;
-    private final double discount;
-    private final String paymentMethod;
-    private final String orderStatus;
+    public String getOrderDate() {
+        return orderDate;
+    }
+
+    public String getCustomer() {
+        return customer;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getProduct() {
+        return product;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public double getDiscount() {
+        return discount;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public String getOrderStatus() {
+        return orderStatus;
+    }
 
     public double getSalesAmount() {
         return price * quantity * (1 - discount / 100.0);

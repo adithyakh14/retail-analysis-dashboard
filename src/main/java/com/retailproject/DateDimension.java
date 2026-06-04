@@ -1,15 +1,33 @@
 package com.retailproject;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+public record DateDimension(
+        int dateKey,
+        String orderDate,
+        int year,
+        int month,
+        int quarter,
+        String dayOfWeek) {
+    public int getDateKey() {
+        return dateKey;
+    }
 
-@Getter
-@RequiredArgsConstructor
-public class DateDimension {
-    private final int dateKey;
-    private final String orderDate;
-    private final int year;
-    private final int month;
-    private final int quarter;
-    private final String dayOfWeek;
+    public String getOrderDate() {
+        return orderDate;
+    }
+
+    public int getYear() {
+        return year;
+    }
+
+    public int getMonth() {
+        return month;
+    }
+
+    public int getQuarter() {
+        return quarter;
+    }
+
+    public String getDayOfWeek() {
+        return dayOfWeek;
+    }
 }
