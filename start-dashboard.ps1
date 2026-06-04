@@ -7,5 +7,7 @@ if (-not (Test-Path ".\mvnw.cmd")) {
     throw "Missing Maven Wrapper. Ensure mvnw.cmd exists in the project root."
 }
 
-Write-Host "Retail backend API is starting at http://localhost:8080"
+Write-Host "Retail dashboard backend is starting at http://localhost:8080"
+Write-Host "Login: http://localhost:8080/login"
+Write-Host "Dashboard: http://localhost:8080/dashboard/"
 & ".\mvnw.cmd" spring-boot:run

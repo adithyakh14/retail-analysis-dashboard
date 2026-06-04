@@ -2,17 +2,12 @@
 
 ## High-Level Architecture
 
-The project is designed as a separated frontend-backend system.
+The project is designed as a secured Spring Boot application that serves both the protected dashboard UI and the backend APIs from the same runtime.
 
-### Backend
+### Application Runtime
 
 - Technology: Java 21 + Spring Boot
-- Role: exposes REST APIs, loads data, computes analytics, writes output CSV files
-
-### Frontend
-
-- Technology: HTML, CSS, Vanilla JavaScript
-- Role: consumes backend APIs and displays the dashboard
+- Role: serves the login page, protected dashboard assets, REST APIs, security rules, and generated CSV downloads
 
 ### Testing
 
@@ -23,7 +18,7 @@ The project is designed as a separated frontend-backend system.
 
 The final runtime flow is:
 
-`retail.csv` -> data reader -> retail records -> warehouse model -> analytics service -> REST API -> frontend dashboard
+`retail.csv` -> data reader -> retail records -> warehouse model -> analytics service -> protected REST API -> backend-served dashboard UI
 
 ## Core Backend Components
 
@@ -45,7 +40,7 @@ It exposes the backend endpoints for:
 - business question answering
 - CSV download
 
-This is the API surface that Postman and the frontend call.
+This is the API surface that the dashboard and Postman call.
 
 ### `DashboardDataService`
 
@@ -128,20 +123,20 @@ These store descriptive attributes used for slicing and grouping the facts.
 - CSV download support for exports
 - DTO-based request and response layer
 
-## Frontend Architecture
+## Dashboard UI Architecture
 
-The frontend is intentionally simple and independent.
+The dashboard UI is intentionally lightweight and is now served directly by Spring Boot after login.
 
 It uses:
 
-- `index.html` for structure
-- `styles.css` for layout and look
-- `app.js` for API calls and rendering
+- `src/main/resources/static/dashboard/index.html` for structure
+- `src/main/resources/static/dashboard/styles.css` for layout and look
+- `src/main/resources/static/dashboard/app.js` for API calls and rendering
 
-### Frontend Responsibilities
+### Dashboard Responsibilities
 
 - maintain filter state
-- call backend endpoints
+- call protected backend endpoints
 - render summary cards
 - render charts
 - render tables
@@ -149,13 +144,14 @@ It uses:
 
 ### Backend Responsibilities
 
+- login and role-based access control
 - all data loading
 - all analytics logic
 - all aggregation logic
 - all answer-generation logic
 - all export generation
 
-This separation is important because it keeps the frontend focused on presentation and the backend focused on business logic.
+The old standalone `frontend/` folder is still present as a legacy reference, but it is no longer the primary runtime path.
 
 ## Testing Approach
 
@@ -171,6 +167,7 @@ Used to test:
 - response shape
 - filtered queries
 - downloads
+- bearer-token login flow
 
 ### Automated Testing
 
@@ -195,20 +192,17 @@ This makes the project easier to run on machines that do not already have Maven 
 
 ## Deployment Model
 
-Because the project is now API-based with a separate frontend, deployment is logically split into:
-
-- backend API deployment
-- frontend deployment
+Because the project now serves the dashboard and APIs from the same secured Spring Boot runtime, deployment is primarily a single web-service deployment.
 
 Typical production delivery:
 
-- backend hosted on Render
-- frontend hosted separately on a static hosting platform or served by another delivery layer
+- backend and dashboard hosted together on Render
+- API testing still available independently through Postman with bearer-token login
 
 ## Engineering Strengths
 
 - clear separation of concerns
-- API-first design
+- protected browser and API access model
 - understandable data pipeline
 - warehouse-style thinking
 - both manual and automated testing

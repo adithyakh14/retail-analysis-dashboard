@@ -8,7 +8,7 @@ An API, or Application Programming Interface, is a way for one software system t
 
 In this project:
 
-- the frontend asks the backend API for dashboard data
+- the protected dashboard asks the backend API for dashboard data
 - Postman can also ask the backend API for the same data
 
 Example:
@@ -18,7 +18,7 @@ Example:
 
 ## 2. What Does API-Based Mean?
 
-API-based means the frontend and backend communicate through defined endpoints instead of being tightly mixed together.
+API-based means the dashboard and backend communicate through defined endpoints instead of mixing analytics logic directly into the UI.
 
 This gives cleaner structure and makes the system easier to:
 
@@ -27,11 +27,11 @@ This gives cleaner structure and makes the system easier to:
 - maintain
 - extend
 
-## 3. Frontend And Backend Separation
+## 3. Dashboard UI And Backend Responsibilities
 
-### Frontend
+### Dashboard UI
 
-The frontend is what the user sees.
+The dashboard UI is what the user sees after logging in.
 
 In this project, it includes:
 
@@ -43,22 +43,24 @@ In this project, it includes:
 
 ### Backend
 
-The backend is the logic engine behind the scenes.
+The backend is the logic and security engine behind the scenes.
 
 In this project, it:
 
+- serves the login page
+- protects dashboard and API access
 - reads the dataset
 - computes metrics
 - filters records
 - prepares API responses
 
-### Why Separation Matters
+### Why This Split Still Matters
 
-Separating them is a professional design choice because:
+Even though the dashboard is now served by the backend runtime, the responsibilities are still clearly separated because:
 
-- the UI can change without rewriting the business engine
-- the API can be tested independently
-- different frontend clients can reuse the same backend
+- the UI remains lightweight and presentation-focused
+- the API can still be tested independently
+- the business logic stays centralized in backend services
 
 ## 4. What Is Spring Boot?
 
@@ -228,10 +230,10 @@ Deployment means making the project available outside your local machine.
 
 In this project:
 
-- backend can be deployed as a web service
-- frontend can be hosted separately
+- the secured Spring Boot app can be deployed as one web service
+- the dashboard and APIs can both be delivered through the same hosted URL
 
-That means the project can be delivered to a client as a working online solution.
+That means the project can be delivered to a client as a working online solution with one primary entry point.
 
 ## 19. What Is A Dashboard?
 
@@ -278,4 +280,4 @@ Technical side:
 
 If you need one simple sentence:
 
-This project reads retail sales data, transforms it into structured analytics, exposes those analytics through a backend API, and presents them through a separate frontend dashboard for business decision-making.
+This project reads retail sales data, transforms it into structured analytics, exposes those analytics through secured backend APIs, and presents them through a protected dashboard for business decision-making.

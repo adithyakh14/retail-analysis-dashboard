@@ -6,7 +6,7 @@ This file is a ready-to-use guide for presenting the project professionally.
 
 You can start with:
 
-"This project is a Retail Analysis Dashboard built to convert raw retail transaction data into business insights. It uses a Spring Boot backend API, a separate frontend dashboard, and a warehouse-style reporting model to help users analyze revenue, customers, products, cities, discounts, and trends."
+"This project is a Retail Analysis Dashboard built to convert raw retail transaction data into business insights. It uses a secured Spring Boot backend, a protected dashboard UI, and a warehouse-style reporting model to help users analyze revenue, customers, products, cities, discounts, and trends."
 
 ## 2. Business Framing
 
@@ -18,7 +18,7 @@ Say:
 
 Say:
 
-"The system reads a retail CSV dataset, transforms it into structured objects, builds a warehouse-style fact and dimension model, computes key metrics, exposes those results through REST APIs, and displays them through a separate dashboard frontend."
+"The system reads a retail CSV dataset, transforms it into structured objects, builds a warehouse-style fact and dimension model, computes key metrics, exposes those results through protected REST APIs, and displays them through a protected dashboard."
 
 ## 4. Show The User Value
 
@@ -30,13 +30,13 @@ Say:
 
 For a mixed audience:
 
-"The project is split into two parts. The backend API handles all the data loading and analytics logic. The frontend is only responsible for displaying the data and calling the API. This separation makes the project cleaner, easier to test, and closer to how modern real-world systems are built."
+"The project keeps responsibilities clearly separated. The backend handles security, data loading, analytics, and API responses. The dashboard UI focuses on presentation and calling those APIs after login. This keeps the project cleaner, easier to test, and closer to how real-world systems are structured."
 
 ## 6. Explain The Data Flow
 
 Say:
 
-"The flow is straightforward: retail CSV data is loaded, converted into records, organized into reporting structures, aggregated into useful metrics, returned through API endpoints, and then rendered on the frontend dashboard."
+"The flow is straightforward: retail CSV data is loaded, converted into records, organized into reporting structures, aggregated into useful metrics, returned through protected API endpoints, and then rendered on the dashboard."
 
 ## 7. Explain Warehouse Modeling
 
@@ -54,7 +54,7 @@ Say:
 
 Say:
 
-"The project demonstrates multiple professional practices: API-first structure, frontend-backend separation, DTO-based responses, warehouse-style analytics thinking, local reproducibility with Maven wrapper, and automated endpoint testing."
+"The project demonstrates multiple professional practices: protected browser login, token-based API testing, DTO-based responses, warehouse-style analytics thinking, local reproducibility with Maven wrapper, and automated endpoint testing."
 
 ## 10. If The Audience Is Non-Technical
 
@@ -94,7 +94,7 @@ Say:
 
 If asked how it would be delivered to a client:
 
-"The current project is ready to be delivered as a separated frontend and backend solution. The backend API can be deployed as a hosted service, the frontend can be deployed independently, and the client mainly receives the dashboard URL while the API and test assets remain available for support and maintenance."
+"The current project is ready to be delivered as a secured web service. The client mainly receives the dashboard URL, while the protected APIs, Swagger access, and Postman test assets remain available for support and maintenance."
 
 ## 14. Short Closing
 
@@ -104,8 +104,8 @@ You can close with:
 
 ## 15. Very Short 30-Second Version
 
-"This project is a retail analytics dashboard built on a Spring Boot API with a separate frontend. It reads raw sales data from CSV, builds a warehouse-style reporting model, calculates business metrics, and presents them through charts, filters, tables, downloads, and a business Q&A feature."
+"This project is a retail analytics dashboard built on a secured Spring Boot application. It reads raw sales data from CSV, builds a warehouse-style reporting model, calculates business metrics, and presents them through charts, filters, tables, downloads, and a business Q&A feature."
 
 ## 16. Short 60-Second Version
 
-"Retail Analysis Dashboard solves the problem of turning raw retail transaction data into usable business insight. The backend reads CSV data, structures it into fact and dimension-style reporting models, computes analytics, and exposes the results through APIs. A separate frontend consumes those APIs and displays KPIs, charts, tables, and filtered business views. The project also supports API testing through Postman and automated endpoint tests, making it both presentation-friendly and technically professional."
+"Retail Analysis Dashboard solves the problem of turning raw retail transaction data into usable business insight. The backend reads CSV data, structures it into fact and dimension-style reporting models, computes analytics, and exposes the results through protected APIs. A secured dashboard consumes those APIs and displays KPIs, charts, tables, and filtered business views. The project also supports token-based API testing through Postman and automated endpoint tests, making it both presentation-friendly and technically professional."
