@@ -107,6 +107,7 @@ Supported dashboard filters:
 RetailProject/
 |-- frontend/
 |-- postman/
+|-- project-summary/
 |-- .mvn/
 |   `-- wrapper/
 |-- mvnw
@@ -128,7 +129,12 @@ RetailProject/
     |   `-- resources/
     |       `-- retail.csv
     `-- test/
-        `-- java/com/retailproject/DashboardControllerTest.java
+        `-- java/com/retailproject/
+            |-- DashboardControllerTest.java
+            |-- RetailDataReaderTest.java
+            |-- RetailWarehouseAnalyzerTest.java
+            |-- RetailWarehouseBuilderTest.java
+            `-- security/ and web/ unit tests
 ```
 
 ## Local Development
@@ -301,11 +307,44 @@ Run:
 .\mvnw.cmd test
 ```
 
-Primary automated coverage is in:
+Primary automated coverage now includes:
 
 - `src/test/java/com/retailproject/DashboardControllerTest.java`
+  Integration-style endpoint coverage for login, dashboard APIs, downloads, Swagger access, and bearer-token flow.
+- `src/test/java/com/retailproject/security/LoginAttemptServiceTest.java`
+  Unit tests for lockout rules and username normalization.
+- `src/test/java/com/retailproject/security/ApiTokenServiceTest.java`
+  Unit tests for token issuance, lookup, and revocation.
+- `src/test/java/com/retailproject/security/AppUserDetailsServiceTest.java`
+  Unit tests for role loading, password normalization, and locked/unknown users.
+- `src/test/java/com/retailproject/security/CustomAuthenticationFailureHandlerTest.java`
+  Unit tests for invalid-versus-locked login redirects.
+- `src/test/java/com/retailproject/security/ApiTokenAuthenticationFilterTest.java`
+  Unit tests for bearer-token security-context population.
+- `src/test/java/com/retailproject/web/ApiAuthenticationControllerTest.java`
+  Unit tests for API login and logout responses.
+- `src/test/java/com/retailproject/RetailDataReaderTest.java`
+  Unit tests for CSV loading and record aggregations.
+- `src/test/java/com/retailproject/RetailWarehouseBuilderTest.java`
+  Unit tests for warehouse key generation and date dimensions.
+- `src/test/java/com/retailproject/RetailWarehouseAnalyzerTest.java`
+  Unit tests for grouped analytics and totals.
 
-These tests exercise the protected REST endpoints and their basic response contracts.
+Current verified test count:
+
+- `59` tests passing
+
+Run the whole suite:
+
+```powershell
+.\mvnw.cmd test
+```
+
+Run a single test class:
+
+```powershell
+.\mvnw.cmd "-Dtest=LoginAttemptServiceTest" test
+```
 
 ## API Exploration
 

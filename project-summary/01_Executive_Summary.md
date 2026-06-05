@@ -10,8 +10,8 @@ Retail Analysis Dashboard is a business intelligence solution built to help a re
 
 It takes a retail dataset in CSV format, processes it, calculates useful business metrics, and presents the results through:
 
-- a backend API
-- a visual dashboard frontend
+- a secured backend API
+- a protected dashboard UI
 - downloadable report outputs
 
 ## Business Problem
@@ -67,7 +67,7 @@ Instead of only storing transactions, the business can use the same data to:
 
 ## What The User Sees
 
-The user interacts with a dashboard that shows:
+The user interacts with a protected dashboard that shows:
 
 - summary cards
 - charts
@@ -75,16 +75,18 @@ The user interacts with a dashboard that shows:
 - filterable views
 - a business question interface
 
-The dashboard is connected to an API, which means the user interface and data engine are separated properly.
+The dashboard is connected to a secured API, which means the user interface and data engine are separated properly while still being delivered from one Spring Boot runtime.
 
 ## Final Deliverable Nature
 
-This project is now structured as a professional two-part solution:
+This project is now structured as a professional secured web application:
 
-- frontend dashboard
-- backend API
+- protected dashboard entry point
+- backend analytics API
+- downloadable reporting outputs
+- separate Postman API testing flow
 
-This is closer to how modern production systems are typically built.
+This is closer to how modern production systems are typically delivered and maintained.
 
 ## Why This Project Looks Professional
 
@@ -92,6 +94,7 @@ The project demonstrates:
 
 - clear separation between frontend and backend
 - structured API design
+- unit and integration test coverage
 - clean data transformation logic
 - testing through Postman and automated tests
 - deployment-readiness
@@ -99,4 +102,4 @@ The project demonstrates:
 
 ## One-Sentence Summary
 
-Retail Analysis Dashboard is a retail analytics solution that transforms raw sales CSV data into a separated API-driven dashboard experience for business insight, reporting, and decision support.
+Retail Analysis Dashboard is a retail analytics solution that transforms raw sales CSV data into a secured dashboard and API experience for business insight, reporting, and decision support.

@@ -54,7 +54,7 @@ Say:
 
 Say:
 
-"The project demonstrates multiple professional practices: protected browser login, token-based API testing, DTO-based responses, warehouse-style analytics thinking, local reproducibility with Maven wrapper, and automated endpoint testing."
+"The project demonstrates multiple professional practices: protected browser login, token-based API testing, DTO-based responses, warehouse-style analytics thinking, local reproducibility with Maven wrapper, and both unit and integration test coverage."
 
 ## 10. If The Audience Is Non-Technical
 
@@ -109,3 +109,4 @@ You can close with:
 ## 16. Short 60-Second Version
 
 "Retail Analysis Dashboard solves the problem of turning raw retail transaction data into usable business insight. The backend reads CSV data, structures it into fact and dimension-style reporting models, computes analytics, and exposes the results through protected APIs. A secured dashboard consumes those APIs and displays KPIs, charts, tables, and filtered business views. The project also supports token-based API testing through Postman and automated endpoint tests, making it both presentation-friendly and technically professional."
+"Retail Analysis Dashboard solves the problem of turning raw retail transaction data into usable business insight. The backend reads CSV data, structures it into fact and dimension-style reporting models, computes analytics, and exposes the results through protected APIs. A secured dashboard consumes those APIs and displays KPIs, charts, tables, and filtered business views. The project also supports token-based API testing through Postman plus unit and integration tests, making it both presentation-friendly and technically professional."

@@ -193,6 +193,18 @@ It is useful because it lets you:
 - test endpoints independently
 - validate API behavior
 
+## 14A. What Is A Unit Test?
+
+A unit test checks one class or one method in isolation.
+
+Example from this project:
+
+- lockout logic in `LoginAttemptService`
+- token generation in `ApiTokenService`
+- analytics calculations in `RetailWarehouseAnalyzer`
+
+This is different from testing the whole application through the browser or Postman.
+
 ## 15. What Is Lombok?
 
 Lombok is a Java library that reduces boilerplate code.
@@ -273,6 +285,7 @@ Technical side:
 
 - separated architecture
 - API design
+- unit and integration testing
 - testability
 - structured data transformation
 

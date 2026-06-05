@@ -12,6 +12,8 @@ This folder contains presentation-ready material for explaining the Retail Analy
   Plain-English explanation of the main concepts used in the project, including secured API usage, browser login, warehouse modeling, CSV processing, Spring Boot, DTOs, Postman, and deployment.
 - `04_Presentation_Talk_Track.md`
   A ready-to-use speaking guide for presenting the project in a professional way.
+- `05_Testing_Textbook.md`
+  A detailed textbook-style chapter that explains the testing strategy, unit test categories, and the exact test classes added to the project.
 
 ## Suggested Usage
 
@@ -30,6 +32,7 @@ The project is now structured as:
 - Protected backend-served dashboard UI
 - Token-based API login flow for Postman and other API clients
 - Postman collection for API testing
+- Unit and integration test coverage for security, authentication, CSV reading, warehouse modeling, and analytics
 - Maven wrapper for reproducible local execution
 - CSV-based analytics engine with warehouse-style modeling
 

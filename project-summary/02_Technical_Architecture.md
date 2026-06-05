@@ -181,6 +181,20 @@ Used to verify:
 - expected JSON structure
 - download response behavior
 
+Additional focused unit tests:
+
+- `LoginAttemptServiceTest`
+- `ApiTokenServiceTest`
+- `AppUserDetailsServiceTest`
+- `CustomAuthenticationFailureHandlerTest`
+- `ApiTokenAuthenticationFilterTest`
+- `ApiAuthenticationControllerTest`
+- `RetailDataReaderTest`
+- `RetailWarehouseBuilderTest`
+- `RetailWarehouseAnalyzerTest`
+
+These verify the core rule-heavy classes without starting the full application.
+
 ## Build And Run Tooling
 
 The project uses:
@@ -206,6 +220,7 @@ Typical production delivery:
 - understandable data pipeline
 - warehouse-style thinking
 - both manual and automated testing
+- layered coverage through both unit and integration tests
 - local reproducibility through Maven wrapper
 
 ## Important Limitation
