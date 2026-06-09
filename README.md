@@ -2,6 +2,10 @@
 
 Retail Analysis Dashboard is a secured Spring Boot application that serves a protected browser dashboard and its backing REST APIs from the same runtime. It reads a CSV dataset, builds an in-memory warehouse-style model, generates report exports, and exposes typed endpoints behind authenticated access.
 
+Current deployed demo:
+
+- `https://retail-analysis-dashboard-z23s.onrender.com`
+
 ## What The Project Does
 
 - Loads retail transactions from `src/main/resources/retail.csv`
@@ -418,6 +422,13 @@ The recommended deployment is now a single secured Spring Boot web service. The 
 
 The app also respects platform-provided `PORT` values and forwarded headers, which helps it run correctly behind hosted reverse proxies.
 
+Current live deployment:
+
+- app URL: `https://retail-analysis-dashboard-z23s.onrender.com`
+- health check: `https://retail-analysis-dashboard-z23s.onrender.com/api/health`
+- login page: `https://retail-analysis-dashboard-z23s.onrender.com/login`
+- dashboard: `https://retail-analysis-dashboard-z23s.onrender.com/dashboard/`
+
 ### Deployment Files Included
 
 - `render.yaml`
@@ -432,6 +443,16 @@ The app also respects platform-provided `PORT` values and forwarded headers, whi
 3. Deploy the app and confirm `GET /api/health` returns `200 OK`.
 4. Run the Postman collection against the deployed `baseUrl`.
 5. Log in through `/login` and confirm the protected dashboard loads successfully.
+
+### Current Deployment Status
+
+The project has been deployed successfully on Render and manually verified:
+
+- `GET /api/health` returns `200`
+- browser login works for both configured roles
+- protected dashboard loads successfully
+- Postman verification passed for anonymous, user, and admin flows
+- download and API docs authorization rules behaved as expected
 
 ## Important Implementation Notes
 

@@ -96,6 +96,10 @@ If asked how it would be delivered to a client:
 
 "The current project is ready to be delivered as a secured web service. The client mainly receives the dashboard URL, while the protected APIs, Swagger access, and Postman test assets remain available for support and maintenance."
 
+You can now make that concrete by saying:
+
+"The final version is already deployed on Render as a single secured web service, so the product can be opened directly in the browser and demonstrated live."
+
 ## 14. Short Closing
 
 You can close with:

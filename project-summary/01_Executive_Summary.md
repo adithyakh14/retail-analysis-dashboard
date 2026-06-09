@@ -86,6 +86,8 @@ This project is now structured as a professional secured web application:
 - downloadable reporting outputs
 - separate Postman API testing flow
 
+The final product is also deployed as a live hosted service, which means it can be demonstrated directly through a browser without requiring local setup during a client review.
+
 This is closer to how modern production systems are typically delivered and maintained.
 
 ## Why This Project Looks Professional
