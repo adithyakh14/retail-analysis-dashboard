@@ -63,6 +63,11 @@ async function fetchJson(url) {
         credentials: "same-origin"
     });
     if (!response.ok) {
+        const contentType = response.headers.get("content-type") || "";
+        if (contentType.includes("application/json")) {
+            const payload = await response.json();
+            throw new Error(payload.message || `Request failed: ${response.status}`);
+        }
         throw new Error(`Request failed: ${response.status}`);
     }
     return response.json();
@@ -276,7 +281,7 @@ function renderTableElement(tableId, tableData) {
     `;
 }
 
-function renderTable(tableData) {
+function renderTableLegacy(tableData) {
     renderTableElement("dataTable", tableData);
     document.getElementById("pageLabel").textContent = `Page ${tableData.page} of ${tableData.totalPages} · ${tableData.totalRows} rows`;
     document.getElementById("downloadTable").href = `${API_BASE_URL}${tableData.downloadUrl}`;
@@ -302,6 +307,12 @@ function renderAiChart(chart) {
                 : formatCurrency;
         renderBarChart("aiChart", chart.points, formatter);
     }
+}
+
+function renderTable(tableData) {
+    renderTableElement("dataTable", tableData);
+    document.getElementById("pageLabel").textContent = `Page ${tableData.page} of ${tableData.totalPages} | ${tableData.totalRows} rows`;
+    document.getElementById("downloadTable").href = `${API_BASE_URL}${tableData.downloadUrl}`;
 }
 
 function renderLineChartInto(target, points) {

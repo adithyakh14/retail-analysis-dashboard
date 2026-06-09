@@ -1,6 +1,5 @@
 package com.retailproject.config;
 
-import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
@@ -16,9 +15,6 @@ public class OpenApiConfig {
                         .title("RetailProject API")
                         .description("Spring Boot API for the retail analytics dashboard")
                         .version("1.0")
-                        .contact(new Contact().name("RetailProject")))
-                .externalDocs(new ExternalDocumentation()
-                        .description("Project API overview")
-                        .url("http://localhost:8080"));
+                        .contact(new Contact().name("RetailProject")));
     }
 }

@@ -237,6 +237,8 @@ APP_SECURITY_ALLOWED_ORIGINS=https://your-frontend.example.com,https://admin.you
 Cookie defaults are also tightened:
 
 ```text
+server.port=${PORT:8080}
+server.forward-headers-strategy=framework
 server.servlet.session.cookie.http-only=true
 server.servlet.session.cookie.same-site=lax
 ```
@@ -413,6 +415,8 @@ The container builds the Spring Boot jar in a Maven stage and runs it on Java 21
 ### Frontend And Backend On Render
 
 The recommended deployment is now a single secured Spring Boot web service. The application root redirects to `/dashboard/`, which in turn requires login.
+
+The app also respects platform-provided `PORT` values and forwarded headers, which helps it run correctly behind hosted reverse proxies.
 
 ### Deployment Files Included
 
