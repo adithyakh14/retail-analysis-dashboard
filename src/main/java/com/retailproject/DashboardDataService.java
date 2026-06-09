@@ -106,6 +106,14 @@ public class DashboardDataService {
         return response;
     }
 
+    public int recordCount() {
+        return records.size();
+    }
+
+    public String refreshedAt() {
+        return refreshedAt;
+    }
+
     public Map<String, Object> getTable(String name, Map<String, String> params) {
         CsvTable table = readTable(name);
         String search = params.getOrDefault("search", "").trim().toLowerCase(Locale.ROOT);

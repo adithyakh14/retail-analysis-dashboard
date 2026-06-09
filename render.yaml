@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: retail-analysis-dashboard
+    runtime: docker
+    plan: free
+    autoDeploy: true
+    healthCheckPath: /api/health
+    envVars:
+      - key: APP_SECURITY_USERNAME
+        sync: false
+      - key: APP_SECURITY_PASSWORD
+        sync: false
+      - key: APP_SECURITY_USER_USERNAME
+        sync: false
+      - key: APP_SECURITY_USER_PASSWORD
+        sync: false
+      - key: APP_SECURITY_ALLOWED_ORIGINS
+        sync: false

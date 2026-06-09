@@ -44,6 +44,16 @@ class DashboardControllerTest {
     }
 
     @Test
+    void healthEndpointIsPublicAndReturnsDeploymentMetadata() throws Exception {
+        mockMvc.perform(get("/api/health"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("UP"))
+                .andExpect(jsonPath("$.application").value("Retail Analysis Dashboard"))
+                .andExpect(jsonPath("$.datasetRecords").value(greaterThan(0)))
+                .andExpect(jsonPath("$.refreshedAt").isString());
+    }
+
+    @Test
     void loginPageShowsInvalidCredentialsMessage() throws Exception {
         mockMvc.perform(get("/login").param("error", "invalid"))
                 .andExpect(status().isOk())
@@ -159,6 +169,17 @@ class DashboardControllerTest {
                 .andExpect(jsonPath("$.rows").isArray())
                 .andExpect(jsonPath("$.rows", hasSize(5)))
                 .andExpect(jsonPath("$.downloadUrl").value("/download/raw-input"));
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void unknownTableReturnsStructuredBadRequest() throws Exception {
+        mockMvc.perform(get("/api/table")
+                        .param("name", "unknown-table"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("bad_request"))
+                .andExpect(jsonPath("$.message").value("Unknown table: unknown-table"))
+                .andExpect(jsonPath("$.path").value("/api/table"));
     }
 
     @Test

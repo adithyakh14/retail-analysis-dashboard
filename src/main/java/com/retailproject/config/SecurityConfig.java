@@ -37,11 +37,12 @@ public class SecurityConfig {
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .ignoringRequestMatchers(new OrRequestMatcher(
                                 new AntPathRequestMatcher("/api/auth/**"),
+                                new AntPathRequestMatcher("/api/health"),
                                 new AntPathRequestMatcher("/api/**"),
                                 new AntPathRequestMatcher("/download/**"),
                                 new AntPathRequestMatcher("/v3/api-docs/**"))))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/", "/login", "/error/**", "/api/auth/**").permitAll()
+                        .requestMatchers("/", "/login", "/error/**", "/api/auth/**", "/api/health").permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/download/**").hasRole("ADMIN")
                         .requestMatchers("/dashboard/**", "/api/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated())

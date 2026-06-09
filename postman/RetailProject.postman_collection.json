@@ -2,21 +2,21 @@
   "info": {
     "name": "RetailProject API",
     "_postman_id": "9b5f4971-71a8-4e3e-9e4b-d64f7d64a001",
-    "description": "Collection for testing the secured RetailProject backend on Render with API bearer tokens and browser-style dashboard auth.",
+    "description": "Collection for testing the secured RetailProject backend locally or after deployment with API bearer tokens.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "baseUrl",
-      "value": "https://retail-analysis-dashboard.onrender.com"
+      "value": "http://localhost:8080"
     },
     {
       "key": "userUsername",
-      "value": "user"
+      "value": "analyst"
     },
     {
       "key": "userPassword",
-      "value": "user-123"
+      "value": "change-me-user"
     },
     {
       "key": "adminUsername",
@@ -24,7 +24,7 @@
     },
     {
       "key": "adminPassword",
-      "value": "admin-123"
+      "value": "change-me-now"
     },
     {
       "key": "userToken",
@@ -40,6 +40,24 @@
       "name": "Anonymous Access",
       "description": "Requests that should be blocked with 401 when no token is sent.",
       "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "health"
+              ]
+            },
+            "description": "Expected: 200 OK"
+          }
+        },
         {
           "name": "Filter Options Without Token",
           "request": {
@@ -319,7 +337,7 @@
           }
         },
         {
-          "name": "AI Question",
+          "name": "Business Question",
           "request": {
             "auth": {
               "type": "bearer",
@@ -521,6 +539,35 @@
               "path": [
                 "v3",
                 "api-docs"
+              ]
+            },
+            "description": "Expected: 200 OK"
+          }
+        },
+        {
+          "name": "Admin Logout",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "logout"
               ]
             },
             "description": "Expected: 200 OK"

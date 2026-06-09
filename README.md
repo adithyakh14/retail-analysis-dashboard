@@ -73,6 +73,8 @@ Warehouse-style output generated into `output/` at runtime:
   Returns paginated table data for a named dataset.
 - `GET /api/ask`
   Returns an answer, interpretation, and optional chart or table for a business question.
+- `GET /api/health`
+  Public deployment and readiness check for hosting platforms and manual verification.
 - `GET /download/{name}`
   Downloads a CSV file for the selected raw or generated table.
 - `GET /login`
@@ -213,6 +215,7 @@ The project now uses two authentication flows on purpose:
 Protected API paths behave like APIs:
 
 - anonymous requests to `/api/**`, `/download/**`, and `/v3/api-docs/**` return `401 Unauthorized`
+- `/api/health` stays public so deployment platforms can verify the service is up
 - same-origin dashboard calls still work through the browser login session
 - Postman and similar API tools should use the bearer token flow, not browser cookies
 
@@ -329,10 +332,12 @@ Primary automated coverage now includes:
   Unit tests for warehouse key generation and date dimensions.
 - `src/test/java/com/retailproject/RetailWarehouseAnalyzerTest.java`
   Unit tests for grouped analytics and totals.
+- `src/test/java/com/retailproject/DashboardControllerTest.java`
+  Also verifies the public health endpoint and structured bad-request responses for invalid table names.
 
 Current verified test count:
 
-- `59` tests passing
+- `61` tests passing
 
 Run the whole suite:
 
@@ -362,11 +367,20 @@ Recommended Postman flow:
 
 Expected examples:
 
+- `Anonymous Access -> Health Check` -> `200`
 - `User Access -> Filter Options` -> `200`
 - `User Access -> Dashboard Summary` -> `200`
 - `User Access -> Download CSV Should Be Blocked` -> `403`
 - `Admin Access -> API Docs` -> `200`
 - `Anonymous Access -> Filter Options Without Token` -> `401`
+
+Default local Postman variables now match the local application defaults:
+
+- `baseUrl=http://localhost:8080`
+- `userUsername=analyst`
+- `userPassword=change-me-user`
+- `adminUsername=admin`
+- `adminPassword=change-me-now`
 
 ## Generated Folders
 
@@ -398,6 +412,21 @@ The container builds the Spring Boot jar in a Maven stage and runs it on Java 21
 
 The recommended deployment is now a single secured Spring Boot web service. The application root redirects to `/dashboard/`, which in turn requires login.
 
+### Deployment Files Included
+
+- `render.yaml`
+  Render blueprint with `/api/health` as the health check path.
+- `.github/workflows/ci.yml`
+  GitHub Actions workflow that runs the Maven test suite on push and pull request.
+
+### Deployment Checklist
+
+1. Set `APP_SECURITY_USERNAME`, `APP_SECURITY_PASSWORD`, `APP_SECURITY_USER_USERNAME`, and `APP_SECURITY_USER_PASSWORD` in your hosting platform.
+2. Optionally set `APP_SECURITY_ALLOWED_ORIGINS` if the dashboard or API will be called cross-origin.
+3. Deploy the app and confirm `GET /api/health` returns `200 OK`.
+4. Run the Postman collection against the deployed `baseUrl`.
+5. Log in through `/login` and confirm the protected dashboard loads successfully.
+
 ## Important Implementation Notes
 
 - The protected dashboard is now served directly by Spring Boot.
@@ -406,6 +435,7 @@ The recommended deployment is now a single secured Spring Boot web service. The 
 - The business assistant is rule-based logic inside `DashboardDataService`; it is not backed by an external LLM.
 - Runtime CSV exports are regenerated into `output/` when the application starts.
 - Maven wrapper caches and build artifacts are isolated to project-local generated folders.
+- Invalid API requests now return structured JSON errors for easier Postman and client troubleshooting.
 - Anonymous API access is blocked. Protected API and download routes return `401`, while dashboard users authenticate through the `/login` page.
 - Browser login and API login are intentionally separated so dashboard sessions and Postman testing do not interfere with each other.
 - Cross-origin access is deny-by-default and must be explicitly allowlisted through `APP_SECURITY_ALLOWED_ORIGINS`.
