@@ -25,21 +25,21 @@ The end-to-end flow is:
   Spring Boot entry point.
 - `src/main/java/com/retailproject/web/DashboardController.java`
   HTTP layer for dashboard, filter, table, ask, and download endpoints.
-- `src/main/java/com/retailproject/DashboardDataService.java`
+- `src/main/java/com/retailproject/service/DashboardDataService.java`
   Core application service. Loads data once, builds analytics, writes CSV outputs, and answers API requests.
 - `src/main/java/com/retailproject/security/`
   Authentication, lockout, bearer-token, and audit components.
 - `src/main/java/com/retailproject/config/`
   Security and OpenAPI configuration, plus typed application properties.
-- `src/main/java/com/retailproject/RetailDataReader.java`
+- `src/main/java/com/retailproject/io/RetailDataReader.java`
   Reads the source CSV into domain records.
-- `src/main/java/com/retailproject/RetailWarehouseBuilder.java`
+- `src/main/java/com/retailproject/warehouse/RetailWarehouseBuilder.java`
   Builds the warehouse-style fact and dimension model.
-- `src/main/java/com/retailproject/RetailWarehouseAnalyzer.java`
+- `src/main/java/com/retailproject/warehouse/RetailWarehouseAnalyzer.java`
   Provides reusable warehouse analytics used by the service layer.
-- `src/main/java/com/retailproject/RetailResultsWriter.java`
+- `src/main/java/com/retailproject/io/RetailResultsWriter.java`
   Writes the consolidated analytics export.
-- `src/main/java/com/retailproject/RetailWarehouseWriter.java`
+- `src/main/java/com/retailproject/io/RetailWarehouseWriter.java`
   Writes the fact and dimension CSV outputs.
 - `src/main/resources/static/dashboard/`
   Protected dashboard assets served by Spring Boot after login.
@@ -125,9 +125,11 @@ RetailProject/
     |   |   |-- dto/response/
     |   |   |-- security/
     |   |   |-- web/
-    |   |   |-- DashboardDataService.java
+    |   |   |-- service/DashboardDataService.java
     |   |   |-- RetailProjectApplication.java
-    |   |   `-- warehouse and writer classes
+    |   |   |-- model/
+    |   |   |-- io/
+    |   |   `-- warehouse/
     |   `-- resources/
     |       `-- retail.csv
     `-- test/
@@ -432,7 +434,7 @@ The recommended deployment is now a single secured Spring Boot web service. The 
 - The protected dashboard is now served directly by Spring Boot.
 - The application is CSV-backed and does not use a database.
 - The warehouse is built in memory during startup.
-- The business assistant is rule-based logic inside `DashboardDataService`; it is not backed by an external LLM.
+- The business assistant is rule-based logic inside `service/DashboardDataService`; it is not backed by an external LLM.
 - Runtime CSV exports are regenerated into `output/` when the application starts.
 - Maven wrapper caches and build artifacts are isolated to project-local generated folders.
 - Invalid API requests now return structured JSON errors for easier Postman and client troubleshooting.

@@ -1,9 +1,9 @@
 package com.retailproject.web;
 
-import com.retailproject.DashboardDataService;
 import com.retailproject.dto.AskRequest;
 import com.retailproject.dto.DashboardFilterRequest;
 import com.retailproject.dto.TableRequest;
+import com.retailproject.service.DashboardDataService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

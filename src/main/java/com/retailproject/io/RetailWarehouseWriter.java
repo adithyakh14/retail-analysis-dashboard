@@ -1,5 +1,6 @@
-package com.retailproject;
+package com.retailproject.io;
 
+import com.retailproject.model.RetailWarehouse;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

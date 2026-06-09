@@ -1,5 +1,6 @@
-package com.retailproject;
+package com.retailproject.io;
 
+import com.retailproject.model.RetailRecord;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

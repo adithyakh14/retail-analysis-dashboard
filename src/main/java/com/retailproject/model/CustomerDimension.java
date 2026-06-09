@@ -1,4 +1,4 @@
-package com.retailproject;
+package com.retailproject.model;
 
 public record CustomerDimension(int customerKey, String customerName) {
     public int getCustomerKey() {

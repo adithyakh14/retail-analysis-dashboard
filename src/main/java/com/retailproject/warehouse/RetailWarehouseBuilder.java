@@ -1,5 +1,14 @@
-package com.retailproject;
+package com.retailproject.warehouse;
 
+import com.retailproject.model.CityDimension;
+import com.retailproject.model.CustomerDimension;
+import com.retailproject.model.DateDimension;
+import com.retailproject.model.PaymentDimension;
+import com.retailproject.model.ProductDimension;
+import com.retailproject.model.RetailRecord;
+import com.retailproject.model.RetailWarehouse;
+import com.retailproject.model.SalesFact;
+import com.retailproject.model.StatusDimension;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

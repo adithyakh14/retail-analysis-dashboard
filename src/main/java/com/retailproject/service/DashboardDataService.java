@@ -1,5 +1,12 @@
-package com.retailproject;
+package com.retailproject.service;
 
+import com.retailproject.io.RetailDataReader;
+import com.retailproject.io.RetailResultsWriter;
+import com.retailproject.io.RetailWarehouseWriter;
+import com.retailproject.model.RetailRecord;
+import com.retailproject.model.RetailWarehouse;
+import com.retailproject.warehouse.RetailWarehouseAnalyzer;
+import com.retailproject.warehouse.RetailWarehouseBuilder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;

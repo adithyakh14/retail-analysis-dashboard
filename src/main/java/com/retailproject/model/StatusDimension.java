@@ -1,4 +1,4 @@
-package com.retailproject;
+package com.retailproject.model;
 
 public record StatusDimension(int statusKey, String orderStatus) {
     public int getStatusKey() {

@@ -2,6 +2,11 @@ package com.retailproject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.retailproject.model.DateDimension;
+import com.retailproject.model.RetailRecord;
+import com.retailproject.model.RetailWarehouse;
+import com.retailproject.model.SalesFact;
+import com.retailproject.warehouse.RetailWarehouseBuilder;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;

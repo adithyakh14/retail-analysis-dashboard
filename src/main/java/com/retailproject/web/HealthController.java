@@ -1,8 +1,8 @@
 package com.retailproject.web;
 
-import com.retailproject.DashboardDataService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import com.retailproject.service.DashboardDataService;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;

@@ -57,6 +57,8 @@ It is responsible for:
 
 This class is effectively the analytics engine of the project.
 
+It now lives under a dedicated `service` package so the core application orchestration is separate from the domain model and IO helpers.
+
 ### `RetailDataReader`
 
 Reads the CSV input and converts each row into `RetailRecord` objects.
@@ -71,6 +73,17 @@ Transforms raw records into a warehouse-style structure with:
 ### `RetailWarehouseAnalyzer`
 
 Provides reusable analytics calculations on top of the warehouse structure.
+
+The project now uses clearer package boundaries:
+
+- `model`
+  Domain records, fact table, and dimensions.
+- `io`
+  CSV readers and writers.
+- `warehouse`
+  Warehouse construction and reusable analytics.
+- `service`
+  Dashboard-facing orchestration and question-answering logic.
 
 ### Writers
 

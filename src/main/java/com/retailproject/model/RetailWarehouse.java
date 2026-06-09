@@ -1,4 +1,4 @@
-package com.retailproject;
+package com.retailproject.model;
 
 import java.util.List;
 

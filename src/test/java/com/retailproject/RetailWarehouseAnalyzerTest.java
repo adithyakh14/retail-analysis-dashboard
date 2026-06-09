@@ -2,6 +2,15 @@ package com.retailproject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.retailproject.model.CityDimension;
+import com.retailproject.model.CustomerDimension;
+import com.retailproject.model.DateDimension;
+import com.retailproject.model.PaymentDimension;
+import com.retailproject.model.ProductDimension;
+import com.retailproject.model.RetailWarehouse;
+import com.retailproject.model.SalesFact;
+import com.retailproject.model.StatusDimension;
+import com.retailproject.warehouse.RetailWarehouseAnalyzer;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
