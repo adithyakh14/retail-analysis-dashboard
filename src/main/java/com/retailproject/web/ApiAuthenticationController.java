@@ -7,7 +7,6 @@ import jakarta.validation.Valid;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,13 +23,21 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
-@RequiredArgsConstructor
 public class ApiAuthenticationController {
     private static final DateTimeFormatter EXPIRES_AT_FORMAT = DateTimeFormatter.ISO_INSTANT;
 
     private final AuthenticationManager authenticationManager;
     private final LoginAttemptService loginAttemptService;
     private final ApiTokenService apiTokenService;
+
+    public ApiAuthenticationController(
+            AuthenticationManager authenticationManager,
+            LoginAttemptService loginAttemptService,
+            ApiTokenService apiTokenService) {
+        this.authenticationManager = authenticationManager;
+        this.loginAttemptService = loginAttemptService;
+        this.apiTokenService = apiTokenService;
+    }
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody ApiLoginRequest request) {

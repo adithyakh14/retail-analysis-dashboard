@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -57,7 +58,8 @@ public class DashboardDataService {
         this.analyzer = analyzer;
         this.resultsWriter = resultsWriter;
         this.warehouseWriter = warehouseWriter;
-        this.records = dataReader.readRecordsFromResource(RETAIL_DATASET_RESOURCE);
+        List<RetailRecord> loadedRecords = dataReader.readRecordsFromResource(RETAIL_DATASET_RESOURCE);
+        this.records = List.copyOf(loadedRecords);
         this.warehouse = warehouseBuilder.buildWarehouse(records);
         this.outputDirectory = Path.of(OUTPUT_DIRECTORY_NAME);
         this.refreshedAt = LocalDateTime.now().format(REFRESH_FORMAT);
@@ -103,13 +105,13 @@ public class DashboardDataService {
 
     public Map<String, Object> getFilterOptions() {
         Map<String, Object> response = new LinkedHashMap<>();
-        response.put("dates", records.stream().map(RetailRecord::getOrderDate).distinct().sorted().toList());
-        response.put("cities", sortedDistinct(records, RetailRecord::getCity));
-        response.put("categories", sortedDistinct(records, RetailRecord::getCategory));
-        response.put("products", sortedDistinct(records, RetailRecord::getProduct));
-        response.put("paymentMethods", sortedDistinct(records, RetailRecord::getPaymentMethod));
-        response.put("statuses", sortedDistinct(records, RetailRecord::getOrderStatus));
-        response.put("customers", sortedDistinct(records, RetailRecord::getCustomer));
+        response.put("dates", records.stream().map((RetailRecord record) -> record.getOrderDate()).distinct().sorted().toList());
+        response.put("cities", sortedDistinct(records, (RetailRecord record) -> record.getCity()));
+        response.put("categories", sortedDistinct(records, (RetailRecord record) -> record.getCategory()));
+        response.put("products", sortedDistinct(records, (RetailRecord record) -> record.getProduct()));
+        response.put("paymentMethods", sortedDistinct(records, (RetailRecord record) -> record.getPaymentMethod()));
+        response.put("statuses", sortedDistinct(records, (RetailRecord record) -> record.getOrderStatus()));
+        response.put("customers", sortedDistinct(records, (RetailRecord record) -> record.getCustomer()));
         return response;
     }
 
@@ -540,23 +542,23 @@ public class DashboardDataService {
 
     private List<EntityMatch> findEntityMatches(String query) {
         List<EntityMatch> matches = new ArrayList<>();
-        addEntityMatch(matches, query, sortedDistinct(records, RetailRecord::getCity), "city", MatchType.CITY);
-        addEntityMatch(matches, query, sortedDistinct(records, RetailRecord::getCategory), "category", MatchType.CATEGORY);
-        addEntityMatch(matches, query, sortedDistinct(records, RetailRecord::getProduct), "product", MatchType.PRODUCT);
-        addEntityMatch(matches, query, sortedDistinct(records, RetailRecord::getCustomer), "customer", MatchType.CUSTOMER);
-        addEntityMatch(matches, query, sortedDistinct(records, RetailRecord::getPaymentMethod), "payment method", MatchType.PAYMENT);
-        addEntityMatch(matches, query, sortedDistinct(records, RetailRecord::getOrderStatus), "status", MatchType.STATUS);
+        addEntityMatch(matches, query, sortedDistinct(records, (RetailRecord record) -> record.getCity()), "city", MatchType.CITY);
+        addEntityMatch(matches, query, sortedDistinct(records, (RetailRecord record) -> record.getCategory()), "category", MatchType.CATEGORY);
+        addEntityMatch(matches, query, sortedDistinct(records, (RetailRecord record) -> record.getProduct()), "product", MatchType.PRODUCT);
+        addEntityMatch(matches, query, sortedDistinct(records, (RetailRecord record) -> record.getCustomer()), "customer", MatchType.CUSTOMER);
+        addEntityMatch(matches, query, sortedDistinct(records, (RetailRecord record) -> record.getPaymentMethod()), "payment method", MatchType.PAYMENT);
+        addEntityMatch(matches, query, sortedDistinct(records, (RetailRecord record) -> record.getOrderStatus()), "status", MatchType.STATUS);
         return matches;
     }
 
     private List<EntityMatch> findAllEntityMatches(String query) {
         List<EntityMatch> matches = new ArrayList<>();
-        addAllEntityMatches(matches, query, sortedDistinct(records, RetailRecord::getCity), "city", MatchType.CITY);
-        addAllEntityMatches(matches, query, sortedDistinct(records, RetailRecord::getCategory), "category", MatchType.CATEGORY);
-        addAllEntityMatches(matches, query, sortedDistinct(records, RetailRecord::getProduct), "product", MatchType.PRODUCT);
-        addAllEntityMatches(matches, query, sortedDistinct(records, RetailRecord::getCustomer), "customer", MatchType.CUSTOMER);
-        addAllEntityMatches(matches, query, sortedDistinct(records, RetailRecord::getPaymentMethod), "payment method", MatchType.PAYMENT);
-        addAllEntityMatches(matches, query, sortedDistinct(records, RetailRecord::getOrderStatus), "status", MatchType.STATUS);
+        addAllEntityMatches(matches, query, sortedDistinct(records, (RetailRecord record) -> record.getCity()), "city", MatchType.CITY);
+        addAllEntityMatches(matches, query, sortedDistinct(records, (RetailRecord record) -> record.getCategory()), "category", MatchType.CATEGORY);
+        addAllEntityMatches(matches, query, sortedDistinct(records, (RetailRecord record) -> record.getProduct()), "product", MatchType.PRODUCT);
+        addAllEntityMatches(matches, query, sortedDistinct(records, (RetailRecord record) -> record.getCustomer()), "customer", MatchType.CUSTOMER);
+        addAllEntityMatches(matches, query, sortedDistinct(records, (RetailRecord record) -> record.getPaymentMethod()), "payment method", MatchType.PAYMENT);
+        addAllEntityMatches(matches, query, sortedDistinct(records, (RetailRecord record) -> record.getOrderStatus()), "status", MatchType.STATUS);
         return matches;
     }
 
@@ -578,13 +580,13 @@ public class DashboardDataService {
     }
 
     private MetricSnapshot snapshot(List<RetailRecord> source) {
-        double totalSales = source.stream().mapToDouble(RetailRecord::getSalesAmount).sum();
-        int totalOrders = (int) source.stream().map(RetailRecord::getOrderId).distinct().count();
-        int totalQuantity = source.stream().mapToInt(RetailRecord::getQuantity).sum();
+        double totalSales = source.stream().mapToDouble((RetailRecord record) -> record.getSalesAmount()).sum();
+        int totalOrders = (int) source.stream().map((RetailRecord record) -> record.getOrderId()).distinct().count();
+        int totalQuantity = source.stream().mapToInt((RetailRecord record) -> record.getQuantity()).sum();
         double averageOrderValue = totalOrders == 0 ? 0 : totalSales / totalOrders;
-        double averageDiscount = source.isEmpty() ? 0 : source.stream().mapToDouble(RetailRecord::getDiscount).average().orElse(0);
-        int uniqueCustomers = countDistinct(source, RetailRecord::getCustomer);
-        int uniqueProducts = countDistinct(source, RetailRecord::getProduct);
+        double averageDiscount = source.isEmpty() ? 0 : source.stream().mapToDouble((RetailRecord record) -> record.getDiscount()).average().orElse(0);
+        int uniqueCustomers = countDistinct(source, (RetailRecord record) -> record.getCustomer());
+        int uniqueProducts = countDistinct(source, (RetailRecord record) -> record.getProduct());
         return new MetricSnapshot(totalSales, totalOrders, totalQuantity, averageOrderValue, averageDiscount, uniqueCustomers, uniqueProducts);
     }
 
@@ -611,17 +613,17 @@ public class DashboardDataService {
 
     private double calculateMetric(List<RetailRecord> source, Metric metric) {
         return switch (metric) {
-            case SALES -> source.stream().mapToDouble(RetailRecord::getSalesAmount).sum();
-            case ORDERS -> source.stream().map(RetailRecord::getOrderId).distinct().count();
-            case QUANTITY -> source.stream().mapToInt(RetailRecord::getQuantity).sum();
-            case AVG_DISCOUNT -> source.isEmpty() ? 0 : source.stream().mapToDouble(RetailRecord::getDiscount).average().orElse(0);
+            case SALES -> source.stream().mapToDouble((RetailRecord record) -> record.getSalesAmount()).sum();
+            case ORDERS -> source.stream().map((RetailRecord record) -> record.getOrderId()).distinct().count();
+            case QUANTITY -> source.stream().mapToInt((RetailRecord record) -> record.getQuantity()).sum();
+            case AVG_DISCOUNT -> source.isEmpty() ? 0 : source.stream().mapToDouble((RetailRecord record) -> record.getDiscount()).average().orElse(0);
             case AOV -> {
-                int orderCount = (int) source.stream().map(RetailRecord::getOrderId).distinct().count();
-                double totalSales = source.stream().mapToDouble(RetailRecord::getSalesAmount).sum();
+                int orderCount = (int) source.stream().map((RetailRecord record) -> record.getOrderId()).distinct().count();
+                double totalSales = source.stream().mapToDouble((RetailRecord record) -> record.getSalesAmount()).sum();
                 yield orderCount == 0 ? 0 : totalSales / orderCount;
             }
-            case CUSTOMERS -> source.stream().map(RetailRecord::getCustomer).distinct().count();
-            case PRODUCTS -> source.stream().map(RetailRecord::getProduct).distinct().count();
+            case CUSTOMERS -> source.stream().map((RetailRecord record) -> record.getCustomer()).distinct().count();
+            case PRODUCTS -> source.stream().map((RetailRecord record) -> record.getProduct()).distinct().count();
         };
     }
 
@@ -1028,7 +1030,13 @@ public class DashboardDataService {
         }
 
         boolean lowest = containsAny(lowercase, "lowest order", "smallest order");
-        Map.Entry<Integer, Double> selected = lowest ? bottomOrderEntry(orderValues) : topOrderEntry(orderValues);
+        Map.Entry<Integer, Double> maybeSelected =
+                lowest ? bottomOrderEntry(orderValues) : topOrderEntry(orderValues);
+        if (maybeSelected == null) {
+            response.put("answer", "No order-level data is available for that question.");
+            return response;
+        }
+        Map.Entry<Integer, Double> selected = maybeSelected;
         response.put("answer",
                 "Order " + selected.getKey() + " is the " + (lowest ? "lowest" : "highest")
                         + " value order for " + scopedLabel + " at " + formatCurrency(selected.getValue()) + ".");
@@ -1280,35 +1288,35 @@ public class DashboardDataService {
         return values.entrySet().stream()
                 .sorted(Map.Entry.<String, Double>comparingByValue(Comparator.reverseOrder()).thenComparing(Map.Entry.comparingByKey()))
                 .limit(limit)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (left, right) -> left, LinkedHashMap::new));
+                .collect(Collectors.toMap((Map.Entry<String, Double> entry) -> entry.getKey(), (Map.Entry<String, Double> entry) -> entry.getValue(), (left, right) -> left, LinkedHashMap::new));
     }
 
     private Map<String, Double> bottomEntries(Map<String, Double> values, int limit) {
         return values.entrySet().stream()
                 .sorted(Map.Entry.<String, Double>comparingByValue().thenComparing(Map.Entry.comparingByKey()))
                 .limit(limit)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (left, right) -> left, LinkedHashMap::new));
+                .collect(Collectors.toMap((Map.Entry<String, Double> entry) -> entry.getKey(), (Map.Entry<String, Double> entry) -> entry.getValue(), (left, right) -> left, LinkedHashMap::new));
     }
 
-    private Map.Entry<String, Double> topEntry(Map<String, Double> values) {
+    private @Nullable Map.Entry<String, Double> topEntry(Map<String, Double> values) {
         return values.entrySet().stream()
                 .max(Map.Entry.<String, Double>comparingByValue().thenComparing(Map.Entry.comparingByKey()))
                 .orElse(null);
     }
 
-    private Map.Entry<String, Double> bottomEntry(Map<String, Double> values) {
+    private @Nullable Map.Entry<String, Double> bottomEntry(Map<String, Double> values) {
         return values.entrySet().stream()
                 .min(Map.Entry.<String, Double>comparingByValue().thenComparing(Map.Entry.comparingByKey()))
                 .orElse(null);
     }
 
-    private Map.Entry<Integer, Double> topOrderEntry(Map<Integer, Double> values) {
+    private @Nullable Map.Entry<Integer, Double> topOrderEntry(Map<Integer, Double> values) {
         return values.entrySet().stream()
                 .max(Map.Entry.<Integer, Double>comparingByValue().thenComparing(Map.Entry.comparingByKey()))
                 .orElse(null);
     }
 
-    private Map.Entry<Integer, Double> bottomOrderEntry(Map<Integer, Double> values) {
+    private @Nullable Map.Entry<Integer, Double> bottomOrderEntry(Map<Integer, Double> values) {
         return values.entrySet().stream()
                 .min(Map.Entry.<Integer, Double>comparingByValue().thenComparing(Map.Entry.comparingByKey()))
                 .orElse(null);
@@ -1465,7 +1473,7 @@ public class DashboardDataService {
         return false;
     }
 
-    private String safeKey(Map.Entry<String, Double> entry) {
+    private String safeKey(@Nullable Map.Entry<String, Double> entry) {
         return entry == null ? "the current mix" : entry.getKey();
     }
 

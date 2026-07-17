@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.lang.NonNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,9 @@ public class ApiTokenService {
         TokenSession session = new TokenSession(
                 token,
                 userDetails.getUsername(),
-                userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList(),
+                userDetails.getAuthorities().stream()
+                        .map((@NonNull GrantedAuthority authority) -> authority.getAuthority())
+                        .toList(),
                 expiresAt);
 
         sessionsByToken.put(token, session);

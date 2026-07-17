@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
+import java.util.Objects;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -23,9 +23,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping
 @Tag(name = "Retail Dashboard", description = "Backend APIs for the retail analytics dashboard")
-@RequiredArgsConstructor
 public class DashboardController {
     private final DashboardDataService dataService;
+
+    public DashboardController(DashboardDataService dataService) {
+        this.dataService = dataService;
+    }
 
     @GetMapping("/api/dashboard")
     @Operation(summary = "Get dashboard data", description = "Returns summary cards, charts, trend data, insights, and contribution tables.")
@@ -55,9 +58,10 @@ public class DashboardController {
     @Operation(summary = "Download CSV", description = "Downloads a CSV file for the selected raw or transformed table.")
     public ResponseEntity<ByteArrayResource> download(@Parameter(description = "Dataset name to download") @PathVariable String name) {
         DashboardDataService.DownloadFile file = dataService.getDownloadFile(name);
+        byte[] content = Objects.requireNonNull(file.content(), "download content must not be null");
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("text/csv; charset=UTF-8"))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.fileName() + "\"")
-                .body(new ByteArrayResource(file.content()));
+                .body(new ByteArrayResource(content));
     }
 }

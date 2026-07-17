@@ -47,9 +47,11 @@ class ApiAuthenticationControllerTest {
         when(loginAttemptService.isLocked("analyst")).thenReturn(true);
 
         ResponseEntity<Map<String, Object>> response = controller.login(new ApiLoginRequest("analyst", "user-123"));
+        Map<String, Object> body = response.getBody();
 
         assertEquals(HttpStatus.LOCKED, response.getStatusCode());
-        assertEquals("locked", response.getBody().get("error"));
+        assertNotNull(body);
+        assertEquals("locked", body.get("error"));
     }
 
     @Test
@@ -63,10 +65,12 @@ class ApiAuthenticationControllerTest {
                 new ApiTokenService.TokenSession("token-123", "admin", List.of("ROLE_ADMIN"), Instant.now().plusSeconds(60)));
 
         ResponseEntity<Map<String, Object>> response = controller.login(new ApiLoginRequest("admin", "admin-123"));
+        Map<String, Object> body = response.getBody();
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("token-123", response.getBody().get("accessToken"));
-        assertEquals("admin", response.getBody().get("username"));
+        assertNotNull(body);
+        assertEquals("token-123", body.get("accessToken"));
+        assertEquals("admin", body.get("username"));
         verify(loginAttemptService).reset("admin");
     }
 
@@ -78,10 +82,12 @@ class ApiAuthenticationControllerTest {
         when(loginAttemptService.recordFailure("analyst")).thenReturn(false);
 
         ResponseEntity<Map<String, Object>> response = controller.login(new ApiLoginRequest("analyst", "bad-password"));
+        Map<String, Object> body = response.getBody();
 
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("invalid", response.getBody().get("error"));
-        assertEquals("Invalid username or password.", response.getBody().get("message"));
+        assertNotNull(body);
+        assertEquals("invalid", body.get("error"));
+        assertEquals("Invalid username or password.", body.get("message"));
     }
 
     @Test
@@ -92,9 +98,11 @@ class ApiAuthenticationControllerTest {
         when(loginAttemptService.recordFailure("analyst")).thenReturn(true);
 
         ResponseEntity<Map<String, Object>> response = controller.login(new ApiLoginRequest("analyst", "bad-password"));
+        Map<String, Object> body = response.getBody();
 
         assertEquals(HttpStatus.LOCKED, response.getStatusCode());
-        assertEquals("locked", response.getBody().get("error"));
+        assertNotNull(body);
+        assertEquals("locked", body.get("error"));
     }
 
     @Test
@@ -104,26 +112,31 @@ class ApiAuthenticationControllerTest {
                 .thenThrow(new LockedException("Locked"));
 
         ResponseEntity<Map<String, Object>> response = controller.login(new ApiLoginRequest("analyst", "user-123"));
+        Map<String, Object> body = response.getBody();
 
         assertEquals(HttpStatus.LOCKED, response.getStatusCode());
-        assertEquals("locked", response.getBody().get("error"));
+        assertNotNull(body);
+        assertEquals("locked", body.get("error"));
     }
 
     @Test
     void logoutRevokesBearerTokenAndReturnsSignedOutMessage() {
         ResponseEntity<Map<String, Object>> response = controller.logout("Bearer token-123");
+        Map<String, Object> body = response.getBody();
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Signed out.", response.getBody().get("message"));
+        assertNotNull(body);
+        assertEquals("Signed out.", body.get("message"));
         verify(apiTokenService).revokeToken("token-123");
     }
 
     @Test
     void logoutWithoutAuthorizationHeaderStillSucceeds() {
         ResponseEntity<Map<String, Object>> response = controller.logout(null);
+        Map<String, Object> body = response.getBody();
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals("Signed out.", response.getBody().get("message"));
+        assertNotNull(body);
+        assertEquals("Signed out.", body.get("message"));
     }
 }

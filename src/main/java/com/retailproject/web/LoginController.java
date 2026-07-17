@@ -2,6 +2,7 @@ package com.retailproject.web;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +14,7 @@ public class LoginController {
     @GetMapping("/login")
     @ResponseBody
     public ResponseEntity<String> login(
-            CsrfToken csrfToken,
+            @Nullable CsrfToken csrfToken,
             @RequestParam(name = "error", defaultValue = "") String error,
             @RequestParam(name = "logout", defaultValue = "false") boolean logout) {
         boolean locked = "locked".equalsIgnoreCase(error);
@@ -267,8 +268,9 @@ public class LoginController {
                 .replace("__MESSAGE__", message)
                 .replace("__CSRF_FIELD__", csrfField);
 
+        MediaType contentType = MediaType.TEXT_HTML;
         return ResponseEntity.ok()
-                .contentType(MediaType.TEXT_HTML)
+                .contentType(contentType)
                 .body(html);
     }
 }

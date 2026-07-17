@@ -1,6 +1,5 @@
 package com.retailproject.security;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
@@ -9,9 +8,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-@RequiredArgsConstructor
 public class SecurityAuthenticationAuditListener {
     private final LoginAttemptService loginAttemptService;
+
+    public SecurityAuthenticationAuditListener(LoginAttemptService loginAttemptService) {
+        this.loginAttemptService = loginAttemptService;
+    }
 
     @EventListener
     public void onAuthenticationSuccess(AuthenticationSuccessEvent event) {

@@ -11,6 +11,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.formLogin;
 
+import java.util.Collection;
+import org.hamcrest.Matcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import com.retailproject.security.LoginAttemptService;
@@ -21,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.RequestBuilder;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -45,46 +48,51 @@ class DashboardControllerTest {
 
     @Test
     void healthEndpointIsPublicAndReturnsDeploymentMetadata() throws Exception {
+        Matcher<? super Integer> positiveCount = greaterThan(0);
         mockMvc.perform(get("/api/health"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("UP"))
                 .andExpect(jsonPath("$.application").value("Retail Analysis Dashboard"))
-                .andExpect(jsonPath("$.datasetRecords").value(greaterThan(0)))
+                .andExpect(jsonPath("$.datasetRecords").value(positiveCount))
                 .andExpect(jsonPath("$.refreshedAt").isString());
     }
 
     @Test
     void loginPageShowsInvalidCredentialsMessage() throws Exception {
+        Matcher<String> invalidCredentialsMessage = org.hamcrest.Matchers.containsString("Invalid username or password.");
         mockMvc.perform(get("/login").param("error", "invalid"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Invalid username or password.")));
+                .andExpect(content().string(invalidCredentialsMessage));
     }
 
     @Test
     void invalidLoginRedirectsBackToLoginWithError() throws Exception {
-        mockMvc.perform(formLogin().user("wrong-user").password("wrong-password"))
+        RequestBuilder requestBuilder = formLogin().user("wrong-user").password("wrong-password");
+        mockMvc.perform(requestBuilder)
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/login?error=invalid"));
     }
 
     @Test
     void repeatedInvalidLoginsTriggerTemporaryLockout() throws Exception {
+        RequestBuilder invalidLogin = formLogin().user("analyst").password("bad-password");
         for (int i = 0; i < 2; i++) {
-            mockMvc.perform(formLogin().user("analyst").password("bad-password"))
+            mockMvc.perform(invalidLogin)
                     .andExpect(status().is3xxRedirection())
                     .andExpect(redirectedUrl("/login?error=invalid"));
         }
 
-        mockMvc.perform(formLogin().user("analyst").password("bad-password"))
+        mockMvc.perform(invalidLogin)
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/login?error=locked"));
     }
 
     @Test
     void loginPageShowsLockoutMessage() throws Exception {
+        Matcher<String> lockoutMessage = org.hamcrest.Matchers.containsString("temporarily locked for 5 minutes");
         mockMvc.perform(get("/login").param("error", "locked"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("temporarily locked for 5 minutes")));
+                .andExpect(content().string(lockoutMessage));
     }
 
     @Test
@@ -103,8 +111,9 @@ class DashboardControllerTest {
 
     @Test
     void apiLoginReturnsBearerToken() throws Exception {
+        MediaType jsonMediaType = MediaType.APPLICATION_JSON;
         mockMvc.perform(post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(jsonMediaType)
                         .content("""
                                 {"username":"admin","password":"change-me-now"}
                                 """))
@@ -116,8 +125,9 @@ class DashboardControllerTest {
 
     @Test
     void filterOptionsSupportsBearerTokenFromApiLogin() throws Exception {
+        MediaType jsonMediaType = MediaType.APPLICATION_JSON;
         MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(jsonMediaType)
                         .content("""
                                 {"username":"admin","password":"change-me-now"}
                                 """))
@@ -135,11 +145,12 @@ class DashboardControllerTest {
     @Test
     @WithMockUser(roles = "USER")
     void dashboardReturnsSummaryAndCharts() throws Exception {
+        Matcher<? super Integer> positiveCount = greaterThan(0);
         mockMvc.perform(get("/api/dashboard"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.summary.totalSales").isNumber())
                 .andExpect(jsonPath("$.summary.totalOrders").isNumber())
-                .andExpect(jsonPath("$.meta.overallRecordCount").value(greaterThan(0)))
+                .andExpect(jsonPath("$.meta.overallRecordCount").value(positiveCount))
                 .andExpect(jsonPath("$.charts.salesTrend").isArray())
                 .andExpect(jsonPath("$.insights.topInsights").isArray())
                 .andExpect(jsonPath("$.tables.categoryContribution.columns").isArray());
@@ -159,6 +170,7 @@ class DashboardControllerTest {
     @Test
     @WithMockUser(roles = "USER")
     void tableReturnsPagedRows() throws Exception {
+        Matcher<? super Collection<?>> rowCount = hasSize(5);
         mockMvc.perform(get("/api/table")
                         .param("name", "raw-input")
                         .param("page", "1")
@@ -167,7 +179,7 @@ class DashboardControllerTest {
                 .andExpect(jsonPath("$.name").value("raw-input"))
                 .andExpect(jsonPath("$.columns").isArray())
                 .andExpect(jsonPath("$.rows").isArray())
-                .andExpect(jsonPath("$.rows", hasSize(5)))
+                .andExpect(jsonPath("$.rows", rowCount))
                 .andExpect(jsonPath("$.downloadUrl").value("/download/raw-input"));
     }
 
