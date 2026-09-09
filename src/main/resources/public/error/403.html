@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access Restricted | Retail Dashboard</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px;
+            font-family: "Trebuchet MS", "Segoe UI", sans-serif; color: #1f2430;
+            background: radial-gradient(circle at top left, rgba(201,92,43,.22), transparent 30%),
+                radial-gradient(circle at bottom right, rgba(31,122,114,.18), transparent 30%),
+                linear-gradient(180deg, #f8efe4, #ead7c1);
+        }
+        main {
+            width: min(100%, 540px); padding: 36px; border-radius: 28px;
+            background: rgba(255,250,243,.95); border: 1px solid rgba(255,255,255,.7);
+            box-shadow: 0 24px 60px rgba(77,48,28,.14);
+        }
+        .eyebrow { color: #8f3d17; text-transform: uppercase; letter-spacing: .14em; font-size: .78rem; }
+        h1 { font-family: "Palatino Linotype", Georgia, serif; font-size: 2.4rem; margin: 16px 0; }
+        p { color: #5d6470; line-height: 1.7; }
+        a {
+            display: inline-block; margin-top: 16px; padding: 14px 22px; border-radius: 999px;
+            color: white; background: linear-gradient(90deg, #c95c2b, #1f7a72); text-decoration: none;
+        }
+        a:hover { text-decoration: underline; }
+        a:focus-visible { outline: 3px solid #1f2430; outline-offset: 4px; }
+    </style>
+</head>
+<body>
+    <main>
+        <p class="eyebrow">Retail Dashboard · 403</p>
+        <h1>Access restricted</h1>
+        <p>Your account doesn't have permission to access this page. Swagger documentation is available to administrators only.</p>
+        <p>You can return to the dashboard to continue exploring your retail data.</p>
+        <a href="/dashboard/index.html">Back to dashboard</a>
+    </main>
+</body>
+</html>

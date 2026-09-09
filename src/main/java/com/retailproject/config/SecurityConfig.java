@@ -62,7 +62,7 @@ public class SecurityConfig {
                         .failureHandler(failureHandler)
                         .permitAll())
                 .logout(logout -> logout
-                        .logoutSuccessUrl("/login?logout"))
+                        .logoutSuccessUrl("/login?logout=true"))
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .addFilterBefore(apiTokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(securityAuditFilter, org.springframework.security.web.access.intercept.AuthorizationFilter.class);
