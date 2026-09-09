@@ -40,13 +40,6 @@ const state = {
     search: ""
 };
 
-function readCookie(name) {
-    const cookieValue = document.cookie
-        .split("; ")
-        .find((entry) => entry.startsWith(`${name}=`));
-    return cookieValue ? decodeURIComponent(cookieValue.split("=").slice(1).join("=")) : "";
-}
-
 function apiUrl(path, params = {}) {
     const query = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
@@ -447,10 +440,35 @@ async function refreshAll() {
 }
 
 function wireFilters() {
-    const logoutToken = document.getElementById("logoutCsrfToken");
-    if (logoutToken) {
-        logoutToken.value = readCookie("XSRF-TOKEN");
-    }
+    const logoutForm = document.getElementById("logoutForm");
+    logoutForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const button = logoutForm.querySelector("button");
+        const message = document.getElementById("logoutMessage");
+        button.disabled = true;
+        message.textContent = "";
+        try {
+            const response = await fetch("/dashboard/csrf", {
+                credentials: "same-origin",
+                cache: "no-store",
+                headers: { Accept: "application/json" }
+            });
+            if (response.redirected || response.status === 401) {
+                window.location.assign("/login");
+                return;
+            }
+            if (!response.ok) throw new Error("Unable to prepare sign out");
+            const csrf = await response.json();
+            if (!csrf.parameterName || !csrf.token) throw new Error("Missing sign out token");
+            const logoutToken = document.getElementById("logoutCsrfToken");
+            logoutToken.name = csrf.parameterName;
+            logoutToken.value = csrf.token;
+            logoutForm.submit();
+        } catch (error) {
+            message.textContent = "Unable to sign out. Please try again.";
+            button.disabled = false;
+        }
+    });
 
     Object.keys(state.filters).forEach((key) => {
         const element = document.getElementById(key);
